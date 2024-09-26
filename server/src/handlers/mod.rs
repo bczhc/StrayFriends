@@ -1,3 +1,5 @@
+mod authentication;
+
 use crate::mutex_lock;
 use axum::response::IntoResponse;
 use axum::{debug_handler, Router};
@@ -20,6 +22,8 @@ pub fn router() -> Router {
     let mut router = Router::new();
     add_route!(router, GET "/test", test_api);
     add_route!(router, GET "/routes", list_routes);
+    add_route!(router, POST "/login", authentication::login);
+    add_route!(router, GET "/me/email", authentication::my_email);
     router
 }
 

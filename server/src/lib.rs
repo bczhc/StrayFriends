@@ -1,11 +1,13 @@
 #![feature(try_blocks)]
 #![feature(decl_macro)]
 #![feature(yeet_expr)]
+#![feature(const_trait_impl)]
 
 use crate::config::Config;
 use axum::response::IntoResponse;
-use axum::Json;
+use axum::{Extension, Json};
 use once_cell::sync::Lazy;
+use rand::{thread_rng, Rng};
 use serde::Serialize;
 use sqlx::{Pool, Postgres};
 use std::io;
@@ -14,6 +16,8 @@ use std::sync::{Arc, Mutex};
 
 pub mod config;
 pub mod handlers;
+pub mod jwt;
+pub mod db;
 
 macro lazy_default() {
     Lazy::new(|| Mutex::new(Default::default()))
@@ -101,4 +105,18 @@ pub type PgSqlPool = Pool<Postgres>;
 
 pub struct ApiContext {
     pub db: PgSqlPool,
+}
+
+pub type ApiExtension = Extension<Arc<ApiContext>>;
+
+static ALPHABET_52: &[u8; 52] = b"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+pub fn random_string(length: usize) -> String {
+    let mut rng = thread_rng();
+    (0..length)
+        .map(move |_| {
+            let index = rng.gen_range(0..ALPHABET_52.len());
+            char::from(ALPHABET_52[index])
+        })
+        .collect()
 }
