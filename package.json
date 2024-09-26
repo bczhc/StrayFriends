@@ -1,0 +1,22 @@
+{
+  "name": "stray_friends",
+  "version": "1.0.0",
+  "description": "流浪动物领养管理平台",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build"
+  },
+  "author": "bczhc <bczhc0@126.com>",
+  "license": "MIT",
+  "dependencies": {
+    "vue": "^3.5.9"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.1.4",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.8",
+    "vue-tsc": "^2.1.6"
+  }
+}
