@@ -9,9 +9,12 @@ use clap::Parser;
 use log::{debug, info};
 use server::config::get_config;
 use server::{handlers, mutex_lock, set_up_logging, ApiContext, Args, ARGS, CONFIG};
-use sqlx::postgres::PgPoolOptions;
+use sqlx::postgres::{PgPoolOptions, PgRow, PgTypeInfo, PgValue};
 use std::net::SocketAddr;
 use std::sync::Arc;
+use sqlx::{Database, Decode, FromRow, Postgres, Row, Type, Value};
+use sqlx::error::BoxDynError;
+use server::db::{Password, User};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {

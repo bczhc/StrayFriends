@@ -3,6 +3,11 @@
 #![feature(yeet_expr)]
 #![feature(const_trait_impl)]
 
+/// This is for test purposes, and supposed to be used only in debug mode.
+pub const BYPASS_USER_VALIDATION: bool = true;
+
+pub const DEBUG_MODE: bool = cfg!(debug_assertions);
+
 use crate::config::Config;
 use axum::response::IntoResponse;
 use axum::{Extension, Json};
@@ -15,9 +20,11 @@ use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 
 pub mod config;
+pub mod db;
 pub mod handlers;
 pub mod jwt;
-pub mod db;
+
+pub type DbPool = Pool<Postgres>;
 
 macro lazy_default() {
     Lazy::new(|| Mutex::new(Default::default()))
@@ -101,10 +108,8 @@ pub macro include_sql($name:literal) {
     include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/sqls/", $name, ".sql"))
 }
 
-pub type PgSqlPool = Pool<Postgres>;
-
 pub struct ApiContext {
-    pub db: PgSqlPool,
+    pub db: DbPool,
 }
 
 pub type ApiExtension = Extension<Arc<ApiContext>>;
