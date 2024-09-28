@@ -1,16 +1,22 @@
 <script setup lang="ts">
 import HomeTitle from "./components/HomeTitle.vue";
 import Login from "./components/Login.vue";
+import Signup from "./components/Signup.vue";
 </script>
 
 <template>
-  <div id="background"></div>
-  <div id="foreground">
-    <div class="center">
-      <HomeTitle/>
-      <Login/>
-    </div>
-  </div>
+  <n-message-provider>
+    <n-dialog-provider>
+      <div id="background"></div>
+      <div id="foreground">
+        <div class="center">
+<!--          <HomeTitle/>-->
+<!--          <Login/>-->
+          <Signup/>
+        </div>
+      </div>
+    </n-dialog-provider>
+  </n-message-provider>
 </template>
 
 <style scoped lang="scss">

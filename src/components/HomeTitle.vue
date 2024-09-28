@@ -4,7 +4,15 @@
 
 <template>
   <n-h1 id="title">流浪动物救助站</n-h1>
-  <n-p id="subtitle">领养、捐助，或分享想法</n-p>
+  <n-p id="subtitle"><i>
+    <n-gradient-text type="info" :gradient="{
+      from: 'blue',
+      to: '#ff00e9',
+      deg: 90
+    }">
+      领养、捐助，或分享你的想法
+    </n-gradient-text>
+  </i></n-p>
 </template>
 
 <style scoped lang="scss">
