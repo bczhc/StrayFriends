@@ -9,7 +9,7 @@
       from: 'blue',
       to: '#ff00e9',
       deg: 90
-    }">
+    }" style="filter: brightness(70%)">
       领养、捐助，或分享你的想法
     </n-gradient-text>
   </i></n-p>
@@ -27,6 +27,6 @@
 #subtitle {
   margin-top: 0;
   padding-top: 0;
-  font-weight: bold;
+  font-weight: bold
 }
 </style>

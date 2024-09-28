@@ -18,6 +18,8 @@ use sqlx::{Pool, Postgres};
 use std::io;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
+use axum_extra::{headers, TypedHeader};
+use axum_extra::headers::authorization::Bearer;
 
 pub mod config;
 pub mod db;
@@ -125,3 +127,5 @@ pub fn random_string(length: usize) -> String {
         })
         .collect()
 }
+
+pub type AuthHeader = TypedHeader<headers::Authorization<Bearer>>;

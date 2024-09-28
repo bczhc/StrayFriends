@@ -1,7 +1,7 @@
 use crate::db::{Password, Uid, User};
 use crate::handlers::{api_error, handle_errors};
-use crate::jwt::{validate_user, Claims};
-use crate::{api_ok, db, include_sql, ApiContext, ApiExtension, DbPool};
+use crate::jwt::{validate_token, Claims};
+use crate::{api_ok, db, include_sql, ApiContext, ApiExtension, AuthHeader, DbPool};
 use axum::debug_handler;
 use axum::http::header::SET_COOKIE;
 use axum::http::{HeaderMap, StatusCode};
@@ -10,6 +10,8 @@ use axum_extra::extract::CookieJar;
 use serde::Deserialize;
 use sqlx::{query, Executor};
 use std::sync::Arc;
+use axum_extra::{headers, TypedHeader};
+use axum_extra::headers::authorization::Bearer;
 
 #[derive(Deserialize, Debug)]
 pub struct LoginForm {
@@ -43,7 +45,7 @@ pub async fn login(ext: ApiExtension, form: axum::Form<LoginForm>) -> impl IntoR
         }
 
         let jwt = Claims::new(email, query.0).encode()?;
-        return ([(SET_COOKIE, format!("token={jwt}"))], api_ok!(jwt)).into_response();
+        return api_ok!(jwt);
     };
     handle_errors!(result)
 }
@@ -79,22 +81,15 @@ async fn query_id_from_email(db: &DbPool, email: &str) -> anyhow::Result<Option<
     Ok(uid.map(|x| x.0))
 }
 
-macro validate_user($cookie:expr) {{
-    let Some(claims) = validate_user($cookie) else {
-        return StatusCode::UNAUTHORIZED.into_response();
-    };
-    claims
-}}
-
 #[debug_handler]
-pub async fn my_email(cookie: CookieJar) -> impl IntoResponse {
-    let claims = validate_user!(&cookie);
+pub async fn my_email(auth: AuthHeader) -> impl IntoResponse {
+    let claims = validate_token!(auth);
     api_ok!(claims.email)
 }
 
 #[debug_handler]
-pub async fn my_info(ext: ApiExtension, cookie: CookieJar) -> impl IntoResponse {
-    let claims = validate_user!(&cookie);
+pub async fn my_info(ext: ApiExtension, auth: AuthHeader) -> impl IntoResponse {
+    let claims = validate_token!(auth);
     let r: anyhow::Result<()> = try {
         let db = &ext.db;
         let uid = claims.uid;

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import $ from 'jquery';
 import {computed, ref} from "vue";
-import {ApiResponse, checkEmail, WWW_FORM_URLENCODED_HEADER} from "../main.ts";
-import axios from "axios";
+import {apiRequest} from "../api.ts";
 import {useMessage} from "naive-ui";
+import SpinIndicator from "./SpinIndicator.vue";
+import {checkEmail} from "../main.ts";
 
 let emit = defineEmits<{
   back: [],
@@ -38,15 +38,11 @@ function signupClick() {
 
 
   inProgress.value = true;
-  axios.post('/api/signup', {
+  apiRequest('/api/signup', {
     name: name.value,
     email: email.value,
     password: password.value,
-  }, {
-    headers: WWW_FORM_URLENCODED_HEADER,
-  }).then((x) => {
-    let r = ApiResponse.from(x.data);
-    console.log(r);
+  }).then((r) => {
     if (r.success()) {
       message.success(r.message || '注册成功');
       emit('back');
@@ -57,7 +53,7 @@ function signupClick() {
     message.error(e.toString());
   }).finally(() => {
     inProgress.value = false;
-  })
+  });
 }
 
 </script>
@@ -93,7 +89,7 @@ function signupClick() {
         >
           <div style="display: inline-block">
             <span v-if="!inProgress">注册</span>
-            <n-spin size="small" v-else style="display: inline; filter: invert(100%) brightness(500%)"/>
+            <SpinIndicator v-else/>
           </div>
         </n-button>
       </n-space>

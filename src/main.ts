@@ -1,9 +1,9 @@
 import {createApp} from "vue";
-import App from "./App.vue";
 import naive from 'naive-ui';
 import {router} from "./routes.ts";
+import RouterRoot from "./RouterRoot.vue";
 
-createApp(App)
+createApp(RouterRoot)
     .use(router)
     .use(naive)
     .mount('#app');
@@ -20,32 +20,4 @@ export function delay(ms: number) {
             e();
         }, ms);
     });
-}
-
-export const WWW_FORM_URLENCODED_HEADER = {'content-type': 'application/x-www-form-urlencoded'};
-
-export class ApiResponse {
-    code: number;
-    data?: object;
-    message?: string;
-
-    success() {
-        return this.code == 0;
-    }
-
-    messageOrEmpty() {
-        return this.message || '';
-    }
-
-    dataAs<T>() {
-        return this.data as (T | null);
-    }
-
-    static from(obj: any) {
-        let r = new ApiResponse();
-        r.data = obj['data'];
-        r.code = obj['code'];
-        r.message = obj['message'];
-        return r;
-    }
 }

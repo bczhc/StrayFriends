@@ -3,9 +3,9 @@
 </script>
 
 <template>
-  <h1>world</h1>
+AA
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 
 </style>

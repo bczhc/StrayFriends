@@ -1,7 +1,6 @@
-use axum_extra::extract::CookieJar;
-use base64::Engine;
-use base64::prelude::{BASE64_STANDARD, BASE64_STANDARD_NO_PAD};
 use crate::{random_string, BYPASS_USER_VALIDATION, DEBUG_MODE};
+use base64::prelude::BASE64_STANDARD_NO_PAD;
+use base64::Engine;
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
@@ -41,18 +40,27 @@ impl Claims {
             // only for test purposes. No need to handle errors here.
             let payload = token.split('.').nth(1).unwrap();
             let payload = BASE64_STANDARD_NO_PAD.decode(payload).unwrap();
-            let claims: Claims = serde_json::from_str(std::str::from_utf8(&payload).unwrap()).unwrap();
+            let claims: Claims =
+                serde_json::from_str(std::str::from_utf8(&payload).unwrap()).unwrap();
             return Ok(claims);
         }
         decode::<Claims>(
             token,
             &DecodingKey::from_secret(JWT_SECRET.as_bytes()),
             &Validation::default(),
-        ).map(|x| x.claims)
+        )
+        .map(|x| x.claims)
     }
 }
 
-pub fn validate_user(cookie: &CookieJar) -> Option<Claims> {
-    let token = cookie.get("token")?;
-    Claims::decode(token.value()).ok()
+pub fn validate_token(token: &str) -> Option<Claims> {
+    Claims::decode(token).ok()
 }
+
+pub macro validate_token($auth_header:expr) {{
+    let Some(claims) = validate_token($auth_header.token()) else {
+        use ::axum::response::IntoResponse;
+        return ::axum::http::status::StatusCode::UNAUTHORIZED.into_response()
+    };
+    claims
+}}
