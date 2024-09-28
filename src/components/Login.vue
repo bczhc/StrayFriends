@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import {useMessage, useDialog} from 'naive-ui';
-import HomeTitle from "./HomeTitle.vue";
+import {useDialog, useMessage} from 'naive-ui';
 
 let message = useMessage();
 let dialog = useDialog();
 
-function signupClick() {
+let emit = defineEmits<{
+  signup: [],
+}>();
 
+function signupClick() {
+  emit('signup');
 }
 </script>
 

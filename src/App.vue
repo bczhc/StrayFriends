@@ -2,6 +2,10 @@
 import HomeTitle from "./components/HomeTitle.vue";
 import Login from "./components/Login.vue";
 import Signup from "./components/Signup.vue";
+import {ref} from "vue";
+
+let panelStatus = ref<'login' | 'signup'>('login');
+
 </script>
 
 <template>
@@ -10,9 +14,9 @@ import Signup from "./components/Signup.vue";
       <div id="background"></div>
       <div id="foreground">
         <div class="center">
-<!--          <HomeTitle/>-->
-<!--          <Login/>-->
-          <Signup/>
+          <HomeTitle/>
+          <Login v-if="panelStatus == 'login'" @signup="panelStatus = 'signup'"/>
+          <Signup v-if="panelStatus == 'signup'" @back="panelStatus = 'login'"/>
         </div>
       </div>
     </n-dialog-provider>
