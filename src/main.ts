@@ -1,9 +1,9 @@
 import {createApp} from "vue";
 import naive from 'naive-ui';
 import {router} from "./routes.ts";
-import RouterRoot from "./RouterRoot.vue";
+import AppRoot from "./AppRoot.vue";
 
-createApp(RouterRoot)
+createApp(AppRoot)
     .use(router)
     .use(naive)
     .mount('#app');

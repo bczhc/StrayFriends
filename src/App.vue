@@ -9,18 +9,14 @@ let panelStatus = ref<'login' | 'signup'>('login');
 </script>
 
 <template>
-  <n-message-provider>
-    <n-dialog-provider>
-      <div id="background"></div>
-      <div id="foreground">
-        <div class="center">
-          <HomeTitle/>
-          <Login v-if="panelStatus == 'login'" @signup="panelStatus = 'signup'"/>
-          <Signup v-if="panelStatus == 'signup'" @back="panelStatus = 'login'"/>
-        </div>
-      </div>
-    </n-dialog-provider>
-  </n-message-provider>
+  <div id="background"></div>
+  <div id="foreground">
+    <div class="center">
+      <HomeTitle/>
+      <Login v-if="panelStatus == 'login'" @signup="panelStatus = 'signup'"/>
+      <Signup v-if="panelStatus == 'signup'" @back="panelStatus = 'login'"/>
+    </div>
+  </div>
 </template>
 
 <style scoped lang="scss">
