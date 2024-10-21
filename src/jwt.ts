@@ -10,3 +10,6 @@ function get() {
 
 export let JWT_STORE = store;
 export let JWT_GET = get;
+export let JWT_CLEAR = () => {
+    localStorage.removeItem(JWT_LOCAL_STORAGE_KEY);
+};

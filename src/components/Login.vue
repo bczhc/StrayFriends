@@ -4,13 +4,14 @@ import {ref} from "vue";
 import SpinIndicator from "./SpinIndicator.vue";
 import {apiRequest, useAxios} from "../api.ts";
 import {delay} from "../main.ts";
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {JWT_STORE} from "../jwt.ts";
 
 let message = useMessage();
 let dialog = useDialog();
 let axios = useAxios();
 let router = useRouter();
+let route = useRoute();
 
 let email = ref('');
 let password = ref('');
@@ -50,6 +51,11 @@ function loginClick() {
 
 let loginSuccess = ref(false);
 let inProgress = ref(false);
+
+if (route.query['type'] === 'logout') {
+  router.replace({query: null});
+  message.success('已登出');
+}
 </script>
 
 <template>

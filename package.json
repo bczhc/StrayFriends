@@ -14,7 +14,8 @@
     "axios": "^1.7.7",
     "jquery": "^3.7.1",
     "vue": "^3.5.9",
-    "vue-router": "^4.4.5"
+    "vue-router": "^4.4.5",
+    "@vicons/ionicons5": "^0.12.0"
   },
   "devDependencies": {
     "@types/jquery": "^3.5.31",
