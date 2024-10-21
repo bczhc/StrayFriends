@@ -1,0 +1,14 @@
+GET http://localhost:8081/me
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjFAMS5jYyIsInVpZCI6MTIsImV4cCI6MTcyOTU5NTY3MywiaWF0IjoxNzI5NTA5MjczfQ.2vc2F8U50uuuTrSrpQO4cWkHPGEVG3_yzkFuXfKBIRs
+
+###
+POST http://localhost:8081/image/upload
+Content-Type: multipart/form-data; boundary=--------aaa
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6IjFAMS5jYyIsInVpZCI6MTIsImV4cCI6MTcyOTU5NTY3MywiaWF0IjoxNzI5NTA5MjczfQ.2vc2F8U50uuuTrSrpQO4cWkHPGEVG3_yzkFuXfKBIRs
+
+----------aaa
+Content-Disposition: form-data; name="file"; filename="init"
+Content-Type: application/octet-stream
+
+a
+----------aaa

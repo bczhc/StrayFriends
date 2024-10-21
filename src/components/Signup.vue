@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import {computed, ref} from "vue";
-import {apiRequest} from "../api.ts";
+import {apiPost} from "../api.ts";
 import {useMessage} from "naive-ui";
 import SpinIndicator from "./SpinIndicator.vue";
+import PasswordConfirm from "./PasswordConfirm.vue";
 import {checkEmail} from "../main.ts";
 
 let emit = defineEmits<{
@@ -15,30 +16,23 @@ let email = ref<string>('');
 let password = ref<string>('');
 let passwordConfirm = ref<string>('');
 let name = ref<string>('');
+let passwordValidated = ref(true);
 
 let emailValidation = computed(() => {
   return checkEmail(email.value);
 });
 
-let passwordInputStatus = computed(() => {
-  if (password.value === passwordConfirm.value) {
-    return 'success';
-  } else {
-    return 'error';
-  }
-});
-
 let inProgress = ref<boolean>(false);
 
 function signupClick() {
-  if (name.value === '' || !emailValidation.value || passwordInputStatus.value === 'error') {
+  if (name.value === '' || !emailValidation.value || !passwordValidated) {
     message.error('请检查输入');
     return;
   }
 
 
   inProgress.value = true;
-  apiRequest('/api/signup', {
+  apiPost('/api/signup', {
     name: name.value,
     email: email.value,
     password: password.value,
@@ -77,12 +71,11 @@ function signupClick() {
       <n-form-item label="邮箱">
         <n-input v-model:value="email" :status="emailValidation ? 'success' : 'error'"/>
       </n-form-item>
-      <n-form-item label="密码">
-        <n-input type="password" v-model:value="password" :status="passwordInputStatus"/>
-      </n-form-item>
-      <n-form-item label="重复密码">
-        <n-input type="password" v-model:value="passwordConfirm" :status="passwordInputStatus"/>
-      </n-form-item>
+      <PasswordConfirm
+          v-model:password="password"
+          v-model:password-confirm="passwordConfirm"
+          @validated="x => passwordValidated = x"
+      />
       <n-space justify="space-evenly" size="large">
         <n-button block class="full-width-btn" size="large" @click="signupClick" type="primary"
                   :disabled="inProgress"

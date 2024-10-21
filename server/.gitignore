@@ -2,3 +2,5 @@
 /.idea/
 /server.toml
 /server.log
+/uploads
+/tmp

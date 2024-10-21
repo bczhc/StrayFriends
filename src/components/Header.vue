@@ -6,7 +6,6 @@ import {useRoute, useRouter} from "vue-router";
 import {JWT_CLEAR} from "../jwt.ts";
 
 let router = useRouter();
-let route = useRoute();
 
 function renderIcon(icon: Component) {
   return () => {
@@ -34,12 +33,11 @@ let dropdownOptions = [
 function onDropdownSelected(key: DropdownKeys) {
   switch (key) {
     case "my info":
-
+      router.push('/me');
       break;
     case "logout":
       JWT_CLEAR();
       router.push({path: '/', query: {type: 'logout'}})
-      console.log(route);
       break;
   }
 }

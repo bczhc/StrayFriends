@@ -34,15 +34,46 @@ export function useAxios() {
     return axios;
 }
 
-export async function apiRequest(url: string, form: object = {}) {
+export const authHeaders = () => {
+    return {
+        'Authorization': `Bearer ${JWT_GET() || ''}`,
+    };
+}
+
+const authedUrlencodedHeader = () => {
+    return {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        ...authHeaders()
+    };
+}
+
+export async function apiPost(url: string, form: object = {}) {
     await delay(SIMULATE_API_DELAY);
-    console.log(url, form);
     let axios = useAxios();
+    console.log(url, form);
+
     let result: AxiosResponse<any> = await axios.post(url, form, {
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Authorization': `Bearer ${JWT_GET() || ''}`,
-        }
+        headers: authedUrlencodedHeader(),
+    });
+    console.log(result);
+    return ApiResponse.from(result.data);
+}
+
+export async function apiGet(url: string) {
+    await delay(SIMULATE_API_DELAY);
+    let axios = useAxios();
+    let result: AxiosResponse<any> = await axios.get(url, {
+        headers: authedUrlencodedHeader(),
+    });
+    console.log(result);
+    return ApiResponse.from(result.data);
+}
+
+export async function apiPut(url: string) {
+    await delay(SIMULATE_API_DELAY);
+    let axios = useAxios();
+    let result: AxiosResponse<any> = await axios.put(url, {
+        headers: authedUrlencodedHeader(),
     });
     console.log(result);
     return ApiResponse.from(result.data);

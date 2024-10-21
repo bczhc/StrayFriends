@@ -1,17 +1,18 @@
-use crate::db::{Password, Uid, User};
+use crate::db::{Gender, GenderPg, Password, Uid, User};
 use crate::handlers::{api_error, handle_errors};
 use crate::jwt::{validate_token, Claims};
 use crate::{api_ok, db, include_sql, ApiContext, ApiExtension, AuthHeader, DbPool};
-use axum::debug_handler;
+use anyhow::anyhow;
+use axum::{debug_handler, Form};
 use axum::http::header::SET_COOKIE;
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::{AppendHeaders, IntoResponse, Response};
 use axum_extra::extract::CookieJar;
+use axum_extra::headers::authorization::Bearer;
+use axum_extra::{headers, TypedHeader};
 use serde::Deserialize;
 use sqlx::{query, Executor};
 use std::sync::Arc;
-use axum_extra::{headers, TypedHeader};
-use axum_extra::headers::authorization::Bearer;
 
 #[derive(Deserialize, Debug)]
 pub struct LoginForm {
@@ -24,6 +25,16 @@ pub struct SignupForm {
     pub name: String,
     pub password: String,
     pub email: String,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct UpdateUserInfoForm {
+    pub name: String,
+    pub old_password: String,
+    pub avatar_image_id: String,
+    pub new_password: String,
+    pub gender_type: String,
+    pub gender_other: Option<String>,
 }
 
 #[debug_handler]
@@ -98,6 +109,38 @@ pub async fn my_info(ext: ApiExtension, auth: AuthHeader) -> impl IntoResponse {
             .fetch_one(db)
             .await?;
         return api_ok!(user);
+    };
+    handle_errors!(r)
+}
+
+#[debug_handler]
+pub async fn update_info(
+    ext: ApiExtension,
+    auth: AuthHeader,
+    Form(form): Form<UpdateUserInfoForm>,
+) -> impl IntoResponse {
+    let claims = validate_token!(auth);
+    let db = &ext.db;
+    let r: anyhow::Result<_> = try {
+        // validate old password
+        let (old_pass,): (Password,) = sqlx::query_as(include_sql!("query-password-by-uid"))
+            .bind(claims.uid)
+            .fetch_one(db)
+            .await?;
+        if !old_pass.validate(&form.old_password) {
+            return api_error!("Wrong password");
+        }
+
+        sqlx::query(include_sql!("update-user-info"))
+            .bind(claims.uid)
+            .bind(form.name)
+            .bind(form.avatar_image_id)
+            .bind(Password::generate(&form.new_password))
+            .bind(GenderPg::from(
+                Gender::from(&form.gender_type, form.gender_other)
+                    .ok_or_else(|| anyhow!("Invalid gender"))?,
+            ))
+            .execute(db).await?;
     };
     handle_errors!(r)
 }

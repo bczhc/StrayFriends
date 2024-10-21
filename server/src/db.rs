@@ -1,9 +1,10 @@
-use std::ops::Deref;
 use crate::random_string;
 use serde::{Deserialize, Serialize};
 use sqlx::encode::IsNull;
 use sqlx::error::BoxDynError;
 use sqlx::{Database, Decode, Encode, FromRow, Postgres, Type};
+use std::ops::Deref;
+use strum::AsRefStr;
 
 const PASSWORD_SALT_LENGTH: usize = 16;
 
@@ -41,22 +42,61 @@ impl Password {
     }
 }
 
-#[derive(FromRow, Debug, Type, Serialize, Deserialize)]
-pub struct Image {
-    id: String,
-    width: UInt<u32>,
-    height: UInt<u32>,
-}
+pub type ImageId = String;
 
 #[derive(FromRow, Debug, Serialize, Deserialize)]
 pub struct User {
     id: Uid,
     name: String,
     email: String,
-    avatar: Option<Image>,
+    avatar_image_id: Option<ImageId>,
     bio: Option<String>,
     #[serde(skip_serializing)]
     password: Password,
+}
+
+#[derive(Serialize, Deserialize, Debug, AsRefStr)]
+pub enum Gender {
+    Male,
+    Female,
+    Secret,
+    Other(String),
+}
+
+impl Gender {
+    pub fn from(r#type: &str, other: Option<impl Into<String>>) -> Option<Self> {
+        match r#type {
+            "male" => Some(Self::Male),
+            "female" => Some(Self::Female),
+            "secret" => Some(Self::Secret),
+            "other" => Some(Self::Other(other?.into())),
+            _ => None,
+        }
+    }
+}
+
+#[derive(Type, Debug, Serialize)]
+pub struct GenderPg {
+    r#type: String,
+    other: String,
+}
+
+impl GenderPg {
+    fn new(r#type: String, other: String) -> Self {
+        Self { r#type, other }
+    }
+}
+
+impl From<Gender> for GenderPg {
+    fn from(value: Gender) -> Self {
+        let type_string = String::from(value.as_ref());
+        match value {
+            Gender::Male => Self::new(type_string, Default::default()),
+            Gender::Female => Self::new(type_string, Default::default()),
+            Gender::Secret => Self::new(type_string, Default::default()),
+            Gender::Other(x) => Self::new(type_string, x),
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]

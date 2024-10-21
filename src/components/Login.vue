@@ -2,7 +2,7 @@
 import {useDialog, useMessage} from 'naive-ui';
 import {ref} from "vue";
 import SpinIndicator from "./SpinIndicator.vue";
-import {apiRequest, useAxios} from "../api.ts";
+import {apiPost, useAxios} from "../api.ts";
 import {delay} from "../main.ts";
 import {useRoute, useRouter} from "vue-router";
 import {JWT_STORE} from "../jwt.ts";
@@ -27,7 +27,7 @@ function signupClick() {
 function loginClick() {
   loginSuccess.value = false;
   inProgress.value = true;
-  apiRequest('/api/login', {
+  apiPost('/api/login', {
     username: email.value,
     password: password.value,
   }).then(r => {
