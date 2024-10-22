@@ -2,10 +2,10 @@
 import {useDialog, useMessage} from 'naive-ui';
 import {ref} from "vue";
 import SpinIndicator from "./SpinIndicator.vue";
-import {apiPost, useAxios} from "../api.ts";
+import {apiGet, apiPost, useAxios} from "../api.ts";
 import {delay} from "../main.ts";
 import {useRoute, useRouter} from "vue-router";
-import {JWT_STORE} from "../jwt.ts";
+import {JWT_GET, JWT_STORE} from "../jwt.ts";
 
 let message = useMessage();
 let dialog = useDialog();
@@ -56,6 +56,14 @@ if (route.query['type'] === 'logout') {
   router.replace({query: null});
   message.success('已登出');
 }
+
+let token = JWT_GET();
+// go to Home page if the token is validated
+apiGet('/api/me').then(r => {
+  if (r.success()) {
+    router.push('/home');
+  }
+})
 </script>
 
 <template>
