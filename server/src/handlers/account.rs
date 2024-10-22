@@ -1,4 +1,4 @@
-use crate::db::{Gender, GenderPg, Password, Uid, User};
+use crate::db::{change_password, Gender, GenderPg, Password, Uid, User};
 use crate::handlers::{api_error, handle_errors};
 use crate::jwt::{validate_token, Claims};
 use crate::{api_ok, db, include_sql, ApiContext, ApiExtension, AuthHeader, DbPool};
@@ -126,16 +126,20 @@ pub async fn update_info(
     let db = &ext.db;
     let r: anyhow::Result<_> = try {
         debug!("Form: {:?}", form);
-        // validate old password
-        let (old_pass,): (Password,) = sqlx::query_as(include_sql!("query-password-by-uid"))
-            .bind(claims.uid)
-            .fetch_one(db)
-            .await?;
-        if !old_pass.validate(&form.old_password) {
-            return api_error!("原密码错误");
+        
+        if !form.new_password.is_empty() {
+            // validate old password
+            let (old_pass,): (Password,) = sqlx::query_as(include_sql!("query-password-by-uid"))
+                .bind(claims.uid)
+                .fetch_one(db)
+                .await?;
+            if !old_pass.validate(&form.old_password) {
+                return api_error!("原密码错误");
+            }
+            let new_password = Password::generate(&form.new_password);
+            change_password(db, &new_password).await?;
         }
 
-        let new_password = Password::generate(&form.new_password);
         let gender_pg = GenderPg::from(
             Gender::from(&form.gender_type, form.gender_other)
                 .ok_or_else(|| anyhow!("无效性别"))?,
@@ -144,8 +148,6 @@ pub async fn update_info(
             .bind(claims.uid)
             .bind(form.name)
             .bind(form.avatar_image_id)
-            .bind(&new_password.blake3)
-            .bind(&new_password.salt)
             .bind(&gender_pg.r#type)
             .bind(&gender_pg.other)
             .bind(form.bio)

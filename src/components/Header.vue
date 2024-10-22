@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import {Component, h} from "vue";
+import {Component, h, ref} from "vue";
 import {NIcon} from "naive-ui";
 import {LogOutOutline, PersonCircleOutline} from "@vicons/ionicons5";
-import {useRoute, useRouter} from "vue-router";
+import {useRouter} from "vue-router";
 import {JWT_CLEAR} from "../jwt.ts";
+import UserInfo from "./UserInfo.vue";
 
 let router = useRouter();
+let showUserInfoModal = ref(false);
 
 function renderIcon(icon: Component) {
   return () => {
@@ -33,7 +35,7 @@ let dropdownOptions = [
 function onDropdownSelected(key: DropdownKeys) {
   switch (key) {
     case "my info":
-      router.push('/me');
+      showUserInfoModal.value = true;
       break;
     case "logout":
       JWT_CLEAR();
@@ -44,6 +46,19 @@ function onDropdownSelected(key: DropdownKeys) {
 </script>
 
 <template>
+  <n-modal v-model:show="showUserInfoModal">
+    <n-card
+        style="width: 600px"
+        title="用户资料"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+    >
+      <UserInfo/>
+    </n-card>
+  </n-modal>
+
   <n-page-header
       class="header"
   >

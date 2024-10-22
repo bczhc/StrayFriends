@@ -1,9 +1,10 @@
-use crate::random_string;
+use crate::{include_sql, random_string};
 use serde::{Deserialize, Serialize};
 use sqlx::encode::IsNull;
 use sqlx::error::BoxDynError;
-use sqlx::{Database, Decode, Encode, FromRow, Postgres, Type};
+use sqlx::{Database, Decode, Encode, Error, FromRow, PgPool, Postgres, Type};
 use std::ops::Deref;
+use sqlx::postgres::PgQueryResult;
 use strum::AsRefStr;
 
 const PASSWORD_SALT_LENGTH: usize = 16;
@@ -116,6 +117,13 @@ impl From<Gender> for GenderPg {
             Gender::Other(x) => Self::new(type_string, x),
         }
     }
+}
+
+pub async fn change_password(db: &PgPool, new: &Password) -> Result<PgQueryResult, Error> {
+    sqlx::query(include_sql!("update-user-info"))
+        .bind(&new.blake3)
+        .bind(&new.salt)
+        .execute(db).await
 }
 
 #[derive(Debug, Serialize, Deserialize)]
