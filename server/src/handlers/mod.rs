@@ -1,5 +1,5 @@
 mod account;
-mod file;
+mod upload;
 
 use crate::mutex_lock;
 use axum::response::IntoResponse;
@@ -27,8 +27,8 @@ pub fn router() -> Router {
     add_route!(router, POST "/signup", account::signup);
     add_route!(router, GET "/me/email", account::my_email);
     add_route!(router, GET "/me", account::my_info);
-    add_route!(router, POST "/image/upload", file::upload_image);
-    add_route!(router, GET "/image/:id", file::image);
+    add_route!(router, POST "/image/upload", upload::upload_image);
+    add_route!(router, GET "/image/:id", upload::image);
     add_route!(router, PUT "/me", account::update_info);
     router
 }

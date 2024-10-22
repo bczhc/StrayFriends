@@ -69,10 +69,10 @@ export async function apiGet(url: string) {
     return ApiResponse.from(result.data);
 }
 
-export async function apiPut(url: string) {
+export async function apiPut(url: string, form: object = {}) {
     await delay(SIMULATE_API_DELAY);
     let axios = useAxios();
-    let result: AxiosResponse<any> = await axios.put(url, {
+    let result: AxiosResponse<any> = await axios.put(url, form, {
         headers: authedUrlencodedHeader(),
     });
     console.log(result);

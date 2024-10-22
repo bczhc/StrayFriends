@@ -45,6 +45,7 @@ impl Password {
 pub type ImageId = String;
 
 #[derive(FromRow, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct User {
     id: Uid,
     name: String,
@@ -53,13 +54,19 @@ pub struct User {
     bio: Option<String>,
     #[serde(skip_serializing)]
     password: Password,
+    gender_type: GenderTypePg,
+    gender_other: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, AsRefStr)]
 pub enum Gender {
+    #[strum(serialize = "male")]
     Male,
+    #[strum(serialize = "female")]
     Female,
+    #[strum(serialize = "secret")]
     Secret,
+    #[strum(serialize = "other")]
     Other(String),
 }
 
@@ -75,10 +82,22 @@ impl Gender {
     }
 }
 
-#[derive(Type, Debug, Serialize)]
+#[derive(Type, FromRow, Debug, Serialize, Deserialize)]
+#[sqlx(type_name = "Gender")]
 pub struct GenderPg {
-    r#type: String,
-    other: String,
+    pub r#type: String,
+    pub other: String,
+}
+
+#[derive(Type, Debug, Serialize, Deserialize)]
+#[sqlx(type_name = "GenderType", rename_all = "lowercase")]
+#[serde(rename_all = "lowercase")]
+/// TODO: reduce redundant Pg type definitions
+pub enum GenderTypePg {
+    Male,
+    Female,
+    Secret,
+    Other,
 }
 
 impl GenderPg {
@@ -138,3 +157,15 @@ impl Type<Postgres> for UInt<u32> {
 }
 
 pub type Uid = i64;
+
+#[cfg(test)]
+mod test {
+    use crate::db::Password;
+    use sqlx::Type;
+
+    #[test]
+    pub fn test() {
+        println!("{}", Password::type_info());
+        println!("{:?}", Password::type_info());
+    }
+}

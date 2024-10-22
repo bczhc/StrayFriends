@@ -8,10 +8,12 @@ let message = useMessage();
 
 type GenderValue = 'male' | 'female' | 'secret' | 'other';
 
+let updating = ref(false);
 let name = ref('');
 let oldPassword = ref('');
 let newPassword = ref('');
 let newPasswordConfirm = ref('');
+let bio: Ref<string | null> = ref(null);
 let genderOptions: { label: string, value: GenderValue }[] = [
   {
     label: '男',
@@ -31,14 +33,21 @@ let genderOptions: { label: string, value: GenderValue }[] = [
   }
 ];
 let selectedGender: Ref<GenderValue> = ref('secret');
+let genderOther = ref('');
 
-let avatarImageId = ref('');
+let avatarImageId: Ref<string | null> = ref(null);
 
 let loaded = ref(false);
 
 apiGet('/api/me').then(r => {
   if (r.success()) {
-    name.value = r.data['name'];
+    let data = r.data;
+    console.log(data);
+    name.value = data['name'];
+    selectedGender.value = data['genderType'];
+    genderOther.value = data['genderOther'];
+    avatarImageId.value = data['avatarImageId'];
+    bio.value = data['bio'];
     loaded.value = true;
   } else {
     message.error(r.messageOrEmpty());
@@ -48,7 +57,24 @@ apiGet('/api/me').then(r => {
 });
 
 function updateInfoClick() {
-  apiPut('/')
+  updating.value = true;
+  apiPut('/api/me', {
+    name: name.value,
+    oldPassword: oldPassword.value,
+    newPassword: newPassword.value,
+    avatarImageId: avatarImageId.value,
+    genderType: selectedGender.value,
+    genderOther: genderOther.value,
+    bio: bio.value,
+  }).then(r => {
+    if (r.success()) {
+      message.success('更新成功');
+    } else {
+      message.error(r.messageOrEmpty());
+    }
+  }).catch(x => {
+    message.error(x.toString());
+  }).finally(() => updating.value = false);
 }
 
 </script>
@@ -67,7 +93,7 @@ function updateInfoClick() {
           <n-select :options="genderOptions" v-model:value="selectedGender"/>
         </n-gi>
         <n-gi v-if="selectedGender === 'other'">
-          <n-input/>
+          <n-input v-model:value="genderOther"/>
         </n-gi>
       </n-grid>
     </n-form-item>
@@ -95,8 +121,14 @@ function updateInfoClick() {
         v-model:password="newPassword"
         v-model:password-confirm="newPasswordConfirm"
     />
+    <n-form-item label="个人简介">
+      <n-input type="textarea" v-model:value="bio"/>
+    </n-form-item>
     <n-space justify="space-evenly" size="large">
-      <n-button size="large" type="primary" secondary @click="updateInfoClick">更新</n-button>
+      <n-button size="large" type="primary" secondary
+                :disabled="updating"
+                @click="updateInfoClick">更新
+      </n-button>
     </n-space>
   </n-form>
 </template>

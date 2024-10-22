@@ -1,11 +1,12 @@
 use figment::providers::{Format, Toml};
 use figment::Figment;
 use serde::Deserialize;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 #[derive(Deserialize, Debug, Default, Clone)]
 pub struct Config {
     pub listen_port: u16,
+    pub upload_path: PathBuf,
     pub db: Db,
     pub logging: Option<Logging>,
 }

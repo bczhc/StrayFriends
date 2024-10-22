@@ -1,5 +1,5 @@
 use crate::handlers::handle_errors;
-use crate::{api_ok, include_sql, ApiExtension, AuthHeader};
+use crate::{api_ok, include_sql, mutex_lock, ApiExtension, AuthHeader, CONFIG};
 use anyhow::anyhow;
 use axum::body::Body;
 use axum::extract::{Multipart};
@@ -19,19 +19,10 @@ use std::path::{Path, PathBuf};
 use tokio_util::io::ReaderStream;
 use uuid::Uuid;
 
-pub static TMP_DIR: Lazy<&Path> = Lazy::new(|| Path::new("./tmp").try_creation_dir());
-
-pub fn tmp_file() -> PathBuf {
-    let uuid = Uuid::new_v4();
-    TMP_DIR.join(uuid.to_string()).try_creation_file()
-}
-
 const FILE_DIR: Lazy<PathBuf> = Lazy::new(|| {
-    let path = PathBuf::from("./uploads");
-    if !path.exists() {
-        fs::create_dir(&path).expect(&format!("Direction creation failed: {}", path.display()));
-    }
-    path
+    let guard = mutex_lock!(CONFIG);
+    let path = guard.upload_path.clone();
+    path.try_creation_dir()
 });
 
 fn stored_file_path(hex: &str) -> PathBuf {
@@ -53,7 +44,6 @@ pub async fn upload_image(
         let bytes = &first.bytes().await?;
 
         let mut hasher = Sha1::default();
-        let tmp_file = tmp_file();
         let mut buf = Cursor::new(Vec::new());
         let mut duplicator =
             bczhc_lib::io::duplicator::StreamDuplicator::new(&mut hasher, &mut buf);

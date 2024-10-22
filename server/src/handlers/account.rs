@@ -3,16 +3,17 @@ use crate::handlers::{api_error, handle_errors};
 use crate::jwt::{validate_token, Claims};
 use crate::{api_ok, db, include_sql, ApiContext, ApiExtension, AuthHeader, DbPool};
 use anyhow::anyhow;
-use axum::{debug_handler, Form};
 use axum::http::header::SET_COOKIE;
 use axum::http::{HeaderMap, StatusCode};
 use axum::response::{AppendHeaders, IntoResponse, Response};
+use axum::{debug_handler, Form};
 use axum_extra::extract::CookieJar;
 use axum_extra::headers::authorization::Bearer;
 use axum_extra::{headers, TypedHeader};
 use serde::Deserialize;
 use sqlx::{query, Executor};
 use std::sync::Arc;
+use log::debug;
 
 #[derive(Deserialize, Debug)]
 pub struct LoginForm {
@@ -28,13 +29,15 @@ pub struct SignupForm {
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct UpdateUserInfoForm {
     pub name: String,
     pub old_password: String,
-    pub avatar_image_id: String,
+    pub avatar_image_id: Option<String>,
     pub new_password: String,
     pub gender_type: String,
     pub gender_other: Option<String>,
+    pub bio: Option<String>,
 }
 
 #[debug_handler]
@@ -122,25 +125,33 @@ pub async fn update_info(
     let claims = validate_token!(auth);
     let db = &ext.db;
     let r: anyhow::Result<_> = try {
+        debug!("Form: {:?}", form);
         // validate old password
         let (old_pass,): (Password,) = sqlx::query_as(include_sql!("query-password-by-uid"))
             .bind(claims.uid)
             .fetch_one(db)
             .await?;
         if !old_pass.validate(&form.old_password) {
-            return api_error!("Wrong password");
+            return api_error!("原密码错误");
         }
 
+        let new_password = Password::generate(&form.new_password);
+        let gender_pg = GenderPg::from(
+            Gender::from(&form.gender_type, form.gender_other)
+                .ok_or_else(|| anyhow!("无效性别"))?,
+        );
         sqlx::query(include_sql!("update-user-info"))
             .bind(claims.uid)
             .bind(form.name)
             .bind(form.avatar_image_id)
-            .bind(Password::generate(&form.new_password))
-            .bind(GenderPg::from(
-                Gender::from(&form.gender_type, form.gender_other)
-                    .ok_or_else(|| anyhow!("Invalid gender"))?,
-            ))
-            .execute(db).await?;
+            .bind(&new_password.blake3)
+            .bind(&new_password.salt)
+            .bind(&gender_pg.r#type)
+            .bind(&gender_pg.other)
+            .bind(form.bio)
+            .execute(db)
+            .await?;
+        return api_ok!(());
     };
     handle_errors!(r)
 }
