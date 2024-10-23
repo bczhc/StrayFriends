@@ -5,7 +5,7 @@ let username = ref('用户名');
 </script>
 
 <template>
-  <div style="border: 1px solid; display: inline-block" id="parent">
+  <div id="parent">
     <div class="center-parent">
       <img src="/2.jpg" alt="image" style="max-width: 100%"/>
       <n-h2 class="label">流浪狗</n-h2>
@@ -34,8 +34,17 @@ let username = ref('用户名');
 }
 
 #parent {
+  display: inline-block;
   padding: .5em;
   width: 20em;
+  background-color: white;
+  transition: margin-top 0.2s ease-in-out;
+}
+
+#parent:hover {
+  margin-top: -4px;
+  transition: 0.2s ease-in-out;
+  box-shadow: rgba(255, 255, 255, 0.1) 0 1px 1px 0 inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
 }
 
 #username-div {
