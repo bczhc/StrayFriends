@@ -1,12 +1,33 @@
 <script setup lang="ts">
 import {ref} from "vue";
+import AdoptionRequest from "./AdoptionRequest.vue";
 
 let username = ref('用户名');
 
 let emit = defineEmits(['imageClick', 'adoptionClick', 'userProfileClick'])
+
+let showAdoptionModal = ref(false);
+
+function adoptionClick() {
+  emit('adoptionClick');
+  showAdoptionModal.value = true;
+}
 </script>
 
 <template>
+  <n-modal v-model:show="showAdoptionModal">
+    <n-card
+        style="width: 600px"
+        title="申请领养"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+    >
+      <AdoptionRequest @cancel="showAdoptionModal = false"/>
+    </n-card>
+  </n-modal>
+
   <div id="parent">
     <div class="center-parent">
       <img src="/2.jpg" alt="image" style="max-width: 100%"
@@ -25,10 +46,9 @@ let emit = defineEmits(['imageClick', 'adoptionClick', 'userProfileClick'])
         <n-avatar src="/avatar-demo.jpg" round/>
         <span id="username-text">{{ username }}</span>
       </div>
-      <n-button @click="emit('adoptionClick')">申请领养</n-button>
+      <n-button @click="adoptionClick">申请领养</n-button>
     </div>
   </div>
-
 </template>
 
 <style scoped lang="scss">
