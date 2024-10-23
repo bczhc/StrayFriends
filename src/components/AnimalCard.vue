@@ -2,12 +2,17 @@
 import {ref} from "vue";
 
 let username = ref('用户名');
+
+let emit = defineEmits(['imageClick', 'adoptionClick', 'userProfileClick'])
 </script>
 
 <template>
   <div id="parent">
     <div class="center-parent">
-      <img src="/2.jpg" alt="image" style="max-width: 100%"/>
+      <img src="/2.jpg" alt="image" style="max-width: 100%"
+           @click="emit('imageClick')"
+           id="img"
+      />
       <n-h2 class="label">流浪狗</n-h2>
     </div>
     <div style="padding: 5px">
@@ -15,9 +20,12 @@ let username = ref('用户名');
         路边发现的流浪狗，，，，，，，，，，，，，，，，，，，，
       </n-text>
     </div>
-    <div id="username-div">
-      <n-avatar src="/avatar-demo.jpg" round/>
-      <span id="username-text">{{ username }}</span>
+    <div id="bottom-flex">
+      <div id="username-div" @click="emit('userProfileClick')">
+        <n-avatar src="/avatar-demo.jpg" round/>
+        <span id="username-text">{{ username }}</span>
+      </div>
+      <n-button @click="emit('adoptionClick')">申请领养</n-button>
     </div>
   </div>
 
@@ -51,10 +59,26 @@ let username = ref('用户名');
   padding-top: .5em;
   display: flex;
   align-items: center;
+  cursor: pointer;
+}
+
+#username-div:hover {
+  color: #36ad6a;
+  transition: color 0.2s ease-in-out;
 }
 
 #username-div > *:nth-child(2) {
   margin-left: .5em;
+}
+
+#bottom-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#img {
+  cursor: pointer;
 }
 
 </style>
