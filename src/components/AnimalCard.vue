@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import {ref} from "vue";
 import AdoptionRequest from "./AdoptionRequest.vue";
+import {useRouter} from "vue-router";
 
 let username = ref('用户名');
 
 let emit = defineEmits(['imageClick', 'adoptionClick', 'userProfileClick'])
+let router = useRouter();
 
 let showAdoptionModal = ref(false);
 
@@ -31,7 +33,7 @@ function adoptionClick() {
   <div id="parent">
     <div class="center-parent">
       <img src="/2.jpg" alt="image" style="max-width: 100%"
-           @click="emit('imageClick')"
+           @click="router.push('/animal/1'); emit('imageClick')"
            id="img"
       />
       <n-h2 class="label">流浪狗</n-h2>
@@ -63,7 +65,7 @@ function adoptionClick() {
 
 #parent {
   display: inline-block;
-  padding: .5em;
+  padding: .8em;
   width: 20em;
   background-color: white;
   transition: margin-top 0.2s ease-in-out;
