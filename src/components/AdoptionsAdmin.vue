@@ -14,13 +14,13 @@ const pageSize = 20;
 
 let totalCount = ref(0);
 let list = ref<AdoptionRequest[]>([]);
-let page = ref(0);
+let page = ref(1);
 
 async function fetch() {
   let r = await apiGet('/api/adoptions/count');
   totalCount.value = r;
 
-  r = await apiGet(`/api/adoptions/list?offset=${page.value * pageSize}&limit=${pageSize}`);
+  r = await apiGet(`/api/adoptions/list?offset=${(page.value - 1) * pageSize}&limit=${pageSize}`);
   list.value = r;
   console.log(r);
 }
