@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import {apiGet, apiPut, authHeaders, imageUrl, parseNUploadOnFinishEvent} from "../api.ts";
+import {apiGet, apiPut, authHeaders, GenderValue, imageUrl, parseNUploadOnFinishEvent} from "../api.ts";
 import {Ref, ref} from "vue";
 import PasswordConfirm from "./PasswordConfirm.vue";
 import {useMessage} from 'naive-ui';
 import {messageError} from "../main.ts";
 
 let message = useMessage();
-
-type GenderValue = 'male' | 'female' | 'secret' | 'other';
 
 let updating = ref(false);
 let name = ref('');

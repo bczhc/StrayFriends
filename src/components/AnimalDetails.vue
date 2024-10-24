@@ -99,7 +99,9 @@ function operationOnSelected(key: DropdownKey) {
         <div v-else>
           <div id="content-line1">
             <UserBox :avatar-image="imageUrl(animalInfo.userAvatarImageId)"
-                     :username="animalInfo.username"/>
+                     :username="animalInfo.username"
+                     :user-id="animalInfo.postUid"
+            />
             <div>
               <n-dropdown v-if="checkOwned(animalInfo.postUid)" :options="operationOptions"
                           @select="operationOnSelected">

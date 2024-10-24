@@ -66,6 +66,7 @@ function dropdownOnSelected(key: DropdownKey) {
         <UserBox v-if="userRef"
                  :username="userRef.name"
                  :avatar-image="imageUrl(userRef.avatarImageId)"
+                 :user-id="userRef.id"
         />
         <n-text id="content">
           <span>{{ square.content }}</span><br>

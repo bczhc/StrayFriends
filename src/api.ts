@@ -161,3 +161,5 @@ export interface SquarePost {
     images: string[],
     creationTime: number,
 }
+
+export type GenderValue = 'male' | 'female' | 'secret' | 'other';

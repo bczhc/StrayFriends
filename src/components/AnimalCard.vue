@@ -27,6 +27,7 @@ const props = defineProps<{
   name?: string,
   description?: string,
   userAvatarImage?: string,
+  userId?: number,
   username?: string,
   loading?: boolean,
   postId?: number,
@@ -106,6 +107,7 @@ function operationsOnSelected(key: OptionKey) {
                :username="props.username"
                @click="emit('userProfileClick')"
                style="padding-top: .5em"
+               :user-id="userId"
       />
 
       <div>

@@ -87,6 +87,7 @@ fetchAndUpdateAnimals();
           :post-id="x.postId"
           :adopted="x.adopted"
           :date="formatDate(new Date(x.creationTime * 1000))"
+          :user-id="x.postUid"
           @update="fetchAndUpdateAnimals"
       />
     </div>

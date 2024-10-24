@@ -4,6 +4,7 @@ import {router} from "./routes.ts";
 import AppRoot from "./AppRoot.vue";
 import {MessageApiInjection} from "naive-ui/es/message/src/MessageProvider";
 import {DialogApiInjection} from "naive-ui/es/dialog/src/DialogProvider";
+import {GenderValue, User} from "./api.ts";
 
 createApp(AppRoot)
     .use(router)
@@ -73,4 +74,17 @@ export function normalizeBase64(base64: string) {
         normalized += '='.repeat(4 - normalized.length % 4)
     }
     return normalized
+}
+
+export function genderDisplay(user: User) {
+    switch ((user.genderType as GenderValue)) {
+        case "male":
+            return '男';
+        case "female":
+            return '女';
+        case "secret":
+            return '保密';
+        case "other":
+            return user.genderOther || '未知';
+    }
 }

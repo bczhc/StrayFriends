@@ -1,22 +1,33 @@
 <script setup lang="ts">
-let emit = defineEmits(['click']);
+
+import UserProfile from "./UserProfile.vue";
 
 const props = defineProps<{
   avatarImage: string,
   username: string,
   mobileNumber?: string,
+  userId?: number,
 }>();
 </script>
 
 <template>
-  <div id="username-div" @click="emit('userProfileClick')">
-    <n-avatar :src="props.avatarImage" round/>
+  <n-popover trigger="click" raw>
+    <template #trigger>
+      <div id="username-div">
+        <n-avatar :src="props.avatarImage" round/>
 
-    <div id="username-text">
-      <span>{{ props.username }}</span>
-      <span v-if="props.mobileNumber">{{ props.mobileNumber }}</span>
+        <div id="username-text">
+          <span>{{ props.username }}</span>
+          <span v-if="props.mobileNumber">{{ props.mobileNumber }}</span>
+        </div>
+      </div>
+    </template>
+
+    <!-- popup content -->
+    <div v-if="props.userId">
+      <UserProfile :user-id="props.userId"/>
     </div>
-  </div>
+  </n-popover>
 </template>
 
 <style scoped lang="scss">

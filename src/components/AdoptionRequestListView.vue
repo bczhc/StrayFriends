@@ -106,6 +106,7 @@ function operationClick(key: Key) {
             :avatar-image="imageUrl(user.avatarImageId)"
             :username="user.name"
             :mobile-number="mobileNumber"
+            :user-id="user.id"
         />
         <n-dropdown trigger="click" :options="operationOptions" @select="operationClick">
           <n-button>操作</n-button>
