@@ -5,6 +5,7 @@ mod account;
 mod animal;
 mod upload;
 mod adoption;
+mod square;
 
 use crate::mutex_lock;
 use axum::response::IntoResponse;
@@ -43,6 +44,8 @@ pub fn router() -> Router {
     add_route!(router, GET "/animal/:id", animal::query_animal_post);
     add_route!(router, POST "/adoption", adoption::file_adoption_request);
     add_route!(router, GET "/user/:id", account::query_user_api);
+    add_route!(router, GET "/square", square::list);
+    add_route!(router, POST "/square", square::post_new);
     /* ====================== OWNER OR ADMIN ====================== */
     add_route!(router, PATCH "/animal/:id/adopt", animal::set_adopted);
     add_route!(router, DELETE "/animal/:id", animal::delete);

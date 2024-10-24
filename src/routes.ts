@@ -4,6 +4,7 @@ import Home from "./components/Home.vue";
 import AnimalDetails from "./components/AnimalDetails.vue";
 import PostAnimal from "./components/PostAnimal.vue";
 import AdoptionsAdmin from "./components/AdoptionsAdmin.vue";
+import Square from "./components/Square.vue";
 
 const routes = [
     {path: '/', component: App},
@@ -11,6 +12,7 @@ const routes = [
     {path: '/animal/:id', component: AnimalDetails},
     {path: '/demo', component: PostAnimal},
     {path: '/adoptions', component: AdoptionsAdmin},
+    {path: '/square', component: Square},
 ];
 
 export const router = createRouter({

@@ -21,7 +21,6 @@ const props = defineProps<{
 
 <style scoped lang="scss">
 #username-div {
-  padding-top: .5em;
   display: flex;
   align-items: center;
   cursor: pointer;

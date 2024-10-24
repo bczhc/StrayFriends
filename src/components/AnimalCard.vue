@@ -105,6 +105,7 @@ function operationsOnSelected(key: OptionKey) {
       <UserBox :avatar-image="loading ? '' : props.userAvatarImage"
                :username="props.username"
                @click="emit('userProfileClick')"
+               style="padding-top: .5em"
       />
 
       <div>

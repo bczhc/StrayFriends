@@ -153,3 +153,11 @@ export interface User {
     genderOther: string,
     bio: string,
 }
+
+export interface SquarePost {
+    id: number,
+    postUid: number,
+    content: string,
+    images: string[],
+    creationTime: number,
+}

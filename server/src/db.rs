@@ -165,6 +165,16 @@ pub struct AdoptionRequestQueryRow {
     pub mobile_number: String,
 }
 
+#[derive(Serialize, Debug, FromRow)]
+#[serde(rename_all = "camelCase")]
+pub struct SquarePostRow {
+    pub id: RowId,
+    pub post_uid: RowId,
+    pub content: String,
+    pub images: Vec<String>,
+    pub creation_time: TimestampSec,
+}
+
 type TimestampSec = UInt<u64>;
 
 /// Also integer types in pgsql are signed. This is a bridge type.

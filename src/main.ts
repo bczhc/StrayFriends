@@ -31,6 +31,7 @@ export function formatDate(date: Date) {
 }
 
 export const messageError = (e: any, message: MessageApiInjection) => {
+    console.log(e);
     message.error(e.toString());
 }
 
