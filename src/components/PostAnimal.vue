@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import {Ref, ref} from "vue";
+import {ref} from "vue";
 import {CHECK_DIGITS, messageError} from "../main.ts";
-import {UploadFileInfo, useMessage} from "naive-ui";
-import {apiPost, authHeaders, imageUrl, parseNUploadOnFinishEvent} from "../api.ts";
+import {useMessage} from "naive-ui";
+import {apiPost} from "../api.ts";
+import ImageUpload from "./ImageUpload.vue";
 
 const message = useMessage();
 
@@ -13,16 +14,8 @@ let mobileNumber = ref('');
 
 let emit = defineEmits(['cancel', 'success']);
 
-let imagePreviewUrl = ref('');
-let showImageUploadingModal = ref(false);
-let imageFileList: Ref<UploadFileInfo[]> = ref([]);
 let submitOnProgress = ref(false);
-
-let naiveId2ServerId: Map<string, string> = new Map();
-
-function uploadedImageIds() {
-  return imageFileList.value.map(x => naiveId2ServerId.get(x.id)!!);
-}
+let uploadedImageIds = [];
 
 function checkInput() {
   return name.value != ''
@@ -41,7 +34,7 @@ function submitClick() {
     name: name.value,
     description: description.value,
     content: content.value,
-    imageIdList: JSON.stringify(uploadedImageIds()),
+    imageIdList: JSON.stringify(uploadedImageIds),
     mobileNumber: mobileNumber.value,
   }).then(_r => {
     message.success('发布成功');
@@ -53,15 +46,6 @@ function submitClick() {
 </script>
 
 <template>
-  <n-modal
-      v-model:show="showImageUploadingModal"
-      preset="card"
-      style="width: 80%"
-      title="预览"
-  >
-    <img :src="imagePreviewUrl" style="width: 100%" alt=""/>
-  </n-modal>
-
   <n-form
       label-placement="left"
       label-width="auto"
@@ -79,23 +63,8 @@ function submitClick() {
       />
     </n-form-item>
     <n-form-item label="上传图片" required>
-      <n-upload
-          action="/api/image/upload"
-          :headers="authHeaders()"
-          v-model:file-list="imageFileList"
-          list-type="image-card"
-          @preview="(file: UploadFileInfo) => {
-            let serverImageId = naiveId2ServerId.get(file.id)!!;
-            imagePreviewUrl = imageUrl(serverImageId);
-            showImageUploadingModal = true;
-          }"
-          @finish="x => {
-            let digest = parseNUploadOnFinishEvent(x.event).digest;
-            console.log([x, digest]);
-            naiveId2ServerId.set(x.file.id, digest);
-          }"
-      >
-      </n-upload>
+      <ImageUpload
+          @update="list => uploadedImageIds = list"/>
     </n-form-item>
     <n-form-item label="联系方式" required>
       <n-input :allow-input="CHECK_DIGITS" v-model:value="mobileNumber"
