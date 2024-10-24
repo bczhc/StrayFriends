@@ -7,6 +7,9 @@ import {Ref, ref} from "vue";
 import {useMessage} from 'naive-ui';
 import UserBox from "./UserBox.vue";
 import AdoptionRequest from "./AdoptionRequest.vue";
+import DateView from "./DateView.vue";
+import AdoptionStatus from "./AdoptionStatus.vue";
+import {formatDate} from "../main.ts";
 
 const message = useMessage();
 
@@ -63,8 +66,12 @@ let showAdoptionModal = ref(false);
                      :username="animalInfo.username"/>
             <div>
               <n-button>爱心捐赠</n-button>
-              <n-button @click="showAdoptionModal = true">申请领养</n-button>
+              <n-button @click="showAdoptionModal = true" :disabled="animalInfo.adopted">申请领养</n-button>
             </div>
+          </div>
+          <div id="content-line2">
+            <DateView>{{ formatDate(new Date(animalInfo.creationTime * 1000)) }}</DateView>
+            <AdoptionStatus v-if="animalInfo.adopted"/>
           </div>
           <n-h1>{{ animalInfo.name }}</n-h1>
           <n-text>{{ animalInfo.description }}</n-text>
@@ -104,5 +111,12 @@ let showAdoptionModal = ref(false);
 #content-line1 {
   display: flex;
   justify-content: space-between;
+}
+
+#content-line2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: .5em;
 }
 </style>

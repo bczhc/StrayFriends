@@ -7,6 +7,7 @@ import PostAnimal from "./PostAnimal.vue";
 import {AnimalCardInfo, apiGet, imageUrl} from "../api.ts";
 import {useMessage} from 'naive-ui';
 import TextBanner from "./TextBanner.vue";
+import {formatDate} from "../main.ts";
 
 const message = useMessage();
 
@@ -93,6 +94,8 @@ fetchAndUpdateAnimals();
           :username="x.username"
           :loading="false"
           :post-id="x.postId"
+          :adopted="x.adopted"
+          :date="formatDate(new Date(x.creationTime * 1000))"
       />
     </div>
     <n-pagination v-model:page="page" :page-count="pageCount"

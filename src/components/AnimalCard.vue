@@ -3,6 +3,8 @@ import {computed, ref} from "vue";
 import AdoptionRequest from "./AdoptionRequest.vue";
 import {useRouter} from "vue-router";
 import UserBox from "./UserBox.vue";
+import AdoptionStatus from "./AdoptionStatus.vue";
+import DateView from "./DateView.vue";
 
 let emit = defineEmits(['imageClick', 'adoptionClick', 'userProfileClick'])
 let router = useRouter();
@@ -21,7 +23,9 @@ const props = defineProps<{
   userAvatarImage?: string,
   username?: string,
   loading?: boolean,
-  postId: number,
+  postId?: number,
+  adopted?: boolean,
+  date?: string,
 }>();
 
 let loading = computed(() => props.loading);
@@ -75,6 +79,10 @@ let loading = computed(() => props.loading);
 
       <n-button @click="adoptionClick" :disabled="loading">申请领养</n-button>
     </div>
+    <div id="date-line">
+      <DateView>{{ props.date }}</DateView>
+      <AdoptionStatus v-if="props.adopted"/>
+    </div>
   </div>
 </template>
 
@@ -102,7 +110,7 @@ let loading = computed(() => props.loading);
 #parent:hover {
   margin-top: -4px;
   transition: 0.2s ease-in-out;
-  box-shadow: rgba(255, 255, 255, 0.1) 0 1px 1px 0 inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+  box-shadow: rgba(255, 255, 255, 0.1) 0 1px 1px 0 inset, rgba(50, 50, 93, 0.25) 0 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
 }
 
 #bottom-flex {
@@ -115,4 +123,10 @@ let loading = computed(() => props.loading);
   cursor: pointer;
 }
 
+#date-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: .5em;
+}
 </style>

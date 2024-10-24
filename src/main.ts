@@ -23,3 +23,7 @@ export function delay(ms: number) {
 }
 
 export const CHECK_DIGITS = x => /\d+/.test(x);
+
+export function formatDate(date: Date) {
+    return date.toLocaleString();
+}

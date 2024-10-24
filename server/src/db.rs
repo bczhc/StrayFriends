@@ -150,6 +150,7 @@ pub struct AnimalInfoQueryRow {
     pub content: String,
     pub image_id_list: Vec<String>,
     pub creation_time: TimestampSec,
+    pub adopted: bool,
 }
 
 type TimestampSec = UInt<u64>;
@@ -179,7 +180,7 @@ macro impl_uint($pg_ty:ty, $rs_ty:ty) {
             <$pg_ty as Decode<'_, Postgres>>::decode(value).map(|x| Self(x as $rs_ty))
         }
     }
-    
+
     impl Encode<'_, Postgres> for UInt<$rs_ty> {
         fn encode_by_ref(
             &self,
@@ -188,7 +189,7 @@ macro impl_uint($pg_ty:ty, $rs_ty:ty) {
             <$pg_ty as Encode<'_, Postgres>>::encode(self.0 as $pg_ty, buf)
         }
     }
-    
+
     impl Type<Postgres> for UInt<$rs_ty> {
         fn type_info() -> <Postgres as Database>::TypeInfo {
             <$pg_ty as Type<Postgres>>::type_info()

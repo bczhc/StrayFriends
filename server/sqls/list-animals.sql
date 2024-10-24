@@ -5,7 +5,8 @@ SELECT u.name                                     as username,
        ap.content                                 as content,
        ap.images                                  as image_id_list,
        extract(epoch from ap.creation_time)::int8 as creation_time,
-       ap.id                                      as post_id
+       ap.id                                      as post_id,
+       ap.adopted                                 as adopted
 from animal_post as ap
          LEFT JOIN "user" as u
                    ON ap.post_uid = u.id

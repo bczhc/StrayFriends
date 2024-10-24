@@ -100,4 +100,5 @@ export interface AnimalCardInfo {
     creationTime: number,
     imageIdList: string[],
     postId: number,
+    adopted: boolean,
 }
