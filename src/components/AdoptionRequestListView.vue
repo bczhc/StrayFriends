@@ -45,7 +45,7 @@ async function deleteRequest() {
 }
 
 async function markAnimalAsAdopted() {
-  return await apiPatch(`/api/animal/${props.requestId}/adopt`);
+  return await apiPatch(`/api/animal/${props.animalId}/adopt`);
 }
 
 function deleteConfirm() {

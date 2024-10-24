@@ -10,4 +10,5 @@ SELECT u.name                                     as username,
 from animal_post as ap
          LEFT JOIN "user" as u
                    ON ap.post_uid = u.id
+order by ap.creation_time
 offset $1 limit $2;
