@@ -44,7 +44,7 @@ pub async fn list_requests(
     pagination: Query<PaginationQuery>,
 ) -> impl IntoResponse {
     let r: anyhow::Result<_> = try {
-        let claims = validate_token_admin!(auth);
+        let _claims = validate_token_admin!(auth);
 
         let request: Vec<AdoptionRequestQueryRow> =
             sqlx::query_as(include_sql!("list-adoption-requests"))
@@ -60,7 +60,7 @@ pub async fn list_requests(
 
 pub async fn count(ext: ApiExtension, auth: AuthHeader) -> impl IntoResponse {
     let r: anyhow::Result<_> = try {
-        let claims = validate_token_admin!(auth);
+        let _claims = validate_token_admin!(auth);
 
         let (count,): (PgCount,) = sqlx::query_as(include_sql!("count-adoption-requests"))
             .fetch_one(&ext.db)
@@ -77,7 +77,7 @@ pub async fn delete(
     path: Path<(RowId,)>,
 ) -> impl IntoResponse {
     let r: anyhow::Result<_> = try {
-        let claims = validate_token_admin!(auth);
+        let _claims = validate_token_admin!(auth);
         sqlx::query(include_sql!("delete-adoption-request"))
             .bind(path.0 .0)
             .execute(&ext.db)

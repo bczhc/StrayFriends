@@ -1,20 +1,14 @@
 use crate::db::{change_password, Gender, GenderPg, Password, RowId, Uid, User};
 use crate::handlers::{api_error, handle_errors};
 use crate::jwt::{validate_token, Claims};
-use crate::{api_ok, db, include_sql, ApiContext, ApiExtension, AuthHeader, DbPool};
+use crate::{api_ok, include_sql, ApiExtension, AuthHeader, DbPool};
 use anyhow::anyhow;
-use axum::http::header::SET_COOKIE;
-use axum::http::{HeaderMap, StatusCode};
-use axum::response::{AppendHeaders, IntoResponse, Response};
-use axum::{debug_handler, Form};
-use axum_extra::extract::CookieJar;
-use axum_extra::headers::authorization::Bearer;
-use axum_extra::{headers, TypedHeader};
-use serde::Deserialize;
-use sqlx::{query, Executor, PgPool};
-use std::sync::Arc;
 use axum::extract::Path;
+use axum::response::IntoResponse;
+use axum::{debug_handler, Form};
 use log::debug;
+use serde::Deserialize;
+use sqlx::PgPool;
 
 #[derive(Deserialize, Debug)]
 pub struct LoginForm {
@@ -58,7 +52,7 @@ pub async fn login(ext: ApiExtension, form: axum::Form<LoginForm>) -> impl IntoR
         if !Password::new(query.1, query.2).validate(&form.password) {
             return api_error!("用户名或密码错误");
         }
-        
+
         let user = query_user(db, query.0).await?;
         let jwt = Claims::new(user, query.0).encode()?;
         return api_ok!(jwt);
@@ -113,7 +107,7 @@ async fn query_user(db: &PgPool, uid: RowId) -> anyhow::Result<User> {
 
 pub async fn query_user_api(ext: ApiExtension, path: Path<(RowId,)>) -> impl IntoResponse {
     let r: anyhow::Result<_> = try {
-        let user = query_user(&ext.db, path.0.0).await?;
+        let user = query_user(&ext.db, path.0 .0).await?;
         return api_ok!(user);
     };
     handle_errors!(r)
@@ -141,7 +135,7 @@ pub async fn update_info(
     let db = &ext.db;
     let r: anyhow::Result<_> = try {
         debug!("Form: {:?}", form);
-        
+
         if !form.new_password.is_empty() {
             // validate old password
             let (old_pass,): (Password,) = sqlx::query_as(include_sql!("query-password-by-uid"))

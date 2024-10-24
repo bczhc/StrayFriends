@@ -54,7 +54,7 @@ pub struct User {
     pub avatar_image_id: Option<ImageId>,
     pub bio: Option<String>,
     #[serde(skip_serializing, skip_deserializing)]
-    password: Password,
+    pub password: Password,
     pub gender_type: GenderTypePg,
     pub gender_other: Option<String>,
     pub admin: bool,

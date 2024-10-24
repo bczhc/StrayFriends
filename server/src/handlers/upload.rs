@@ -1,11 +1,12 @@
 use crate::handlers::handle_errors;
+use crate::jwt::validate_token;
 use crate::{api_ok, include_sql, mutex_lock, ApiExtension, AuthHeader, CONFIG};
 use anyhow::anyhow;
 use axum::body::Body;
-use axum::extract::{Multipart};
+use axum::extract::Multipart;
 use axum::http::StatusCode;
-use axum::response::{AppendHeaders, IntoResponse};
-use axum::{debug_handler, extract, http};
+use axum::response::IntoResponse;
+use axum::{debug_handler, extract};
 use axum_extra::headers::{ContentLength, ContentType};
 use axum_extra::TypedHeader;
 use image::{ImageFormat, ImageReader};
@@ -14,12 +15,11 @@ use once_cell::sync::Lazy;
 use sha1::Sha1;
 use std::fs;
 use std::fs::File;
-use std::io::{BufWriter, Cursor, Seek, SeekFrom, Write};
+use std::io::{Cursor, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
 use tokio_util::io::ReaderStream;
-use uuid::Uuid;
 
-const FILE_DIR: Lazy<PathBuf> = Lazy::new(|| {
+static FILE_DIR: Lazy<PathBuf> = Lazy::new(|| {
     let guard = mutex_lock!(CONFIG);
     let path = guard.upload_path.clone();
     path.try_creation_dir()
@@ -37,6 +37,8 @@ pub async fn upload_image(
     mut multipart: Multipart,
 ) -> impl IntoResponse {
     let result: anyhow::Result<_> = try {
+        // only allow logged user to upload images
+        let _ = validate_token!(auth);
         let first = multipart
             .next_field()
             .await?
@@ -53,7 +55,6 @@ pub async fn upload_image(
             duplicator.write_all(&[x])?;
         }
         duplicator.flush()?;
-        drop(duplicator);
 
         let digest = digest::FixedOutput::finalize_fixed(hasher);
         let digest_hex = hex::encode(digest.as_slice());
@@ -120,7 +121,8 @@ where
         let path = self.as_ref();
         if !path.exists() {
             // PANIC: treat IO errors fatal
-            fs::create_dir(path).expect(&format!("Dir creation failed: {}", path.display()));
+            fs::create_dir(path)
+                .unwrap_or_else(|_| panic!("Dir creation failed: {}", path.display()));
         }
         self
     }

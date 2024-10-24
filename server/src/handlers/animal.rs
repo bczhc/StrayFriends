@@ -1,13 +1,12 @@
 use crate::db::{AnimalInfoQueryRow, AnimalPostForm, RowId};
 use crate::handlers::{handle_errors, PaginationQuery};
-use crate::jwt::{validate_token, validate_token_admin, Claims};
-use crate::{api_ok, include_sql, jwt, ApiExtension, AuthHeader};
+use crate::jwt::validate_token;
+use crate::{api_ok, include_sql, ApiExtension, AuthHeader};
 use anyhow::anyhow;
-use axum::extract::{Path, Query, RawQuery};
+use axum::extract::{Path, RawQuery};
 use axum::response::IntoResponse;
 use axum::{debug_handler, Form};
 use serde_with::serde_derive::{Deserialize, Serialize};
-use sqlx::PgPool;
 
 #[debug_handler]
 pub async fn post_animal(

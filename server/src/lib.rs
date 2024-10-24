@@ -11,6 +11,8 @@ pub const DEBUG_MODE: bool = cfg!(debug_assertions);
 use crate::config::Config;
 use axum::response::IntoResponse;
 use axum::{Extension, Json};
+use axum_extra::headers::authorization::Bearer;
+use axum_extra::{headers, TypedHeader};
 use once_cell::sync::Lazy;
 use rand::{thread_rng, Rng};
 use serde::Serialize;
@@ -18,8 +20,6 @@ use sqlx::{Pool, Postgres};
 use std::io;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
-use axum_extra::{headers, TypedHeader};
-use axum_extra::headers::authorization::Bearer;
 
 pub mod config;
 pub mod db;

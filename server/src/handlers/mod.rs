@@ -1,11 +1,10 @@
 /// TODO: Axum `async fn` has lots of boilerplate. A neat way to eliminate them
 ///  is use Rust procedural macros.
-
 mod account;
-mod animal;
-mod upload;
 mod adoption;
+mod animal;
 mod square;
+mod upload;
 
 use crate::mutex_lock;
 use axum::response::IntoResponse;
@@ -15,8 +14,8 @@ use once_cell::sync::Lazy;
 use std::fmt;
 use std::sync::Mutex;
 
+use serde_with::serde_derive::Deserialize;
 use serde_with::{serde_as, DisplayFromStr};
-use serde_with::serde_derive::{Serialize, Deserialize};
 
 static COLLECTED_ROUTES: Lazy<Mutex<Vec<&'static str>>> =
     Lazy::new(|| Mutex::new(Default::default()));
@@ -111,11 +110,11 @@ pub struct PaginationQuery {
 pub macro check_owned_or_admin($claims:expr, $post_id:expr, $db:expr, $ck_sql:literal) {{
     if (!$claims.user.admin) {
         let (owned,): (bool,) = sqlx::query_as(crate::include_sql!($ck_sql))
-        .bind($post_id)
-        .bind($claims.uid)
-        .fetch_optional($db)
-        .await?
-        .unwrap_or((false,));
+            .bind($post_id)
+            .bind($claims.uid)
+            .fetch_optional($db)
+            .await?
+            .unwrap_or((false,));
         if !owned {
             crate::jwt::axum_return_unauthorized!();
         }
@@ -131,7 +130,10 @@ mod test {
     fn test() {
         let a: Result<ListQuery, _> = serde_qs::from_str("offset=0&limit=20");
         let query = ListQuery {
-            pagination: PaginationQuery { offset: 0, limit: 20 }
+            pagination: PaginationQuery {
+                offset: 0,
+                limit: 20,
+            },
         };
         assert_eq!(a.ok(), Some(query));
     }
