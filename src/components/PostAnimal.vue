@@ -20,7 +20,7 @@ let uploadedImageIds = [];
 function checkInput() {
   return name.value != ''
       && description.value != ''
-      && imageFileList.value.length !== 0
+      && uploadedImageIds.length !== 0
       && mobileNumber.value != '';
 }
 
