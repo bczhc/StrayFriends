@@ -130,11 +130,13 @@ pub async fn change_password(db: &PgPool, new: &Password) -> Result<PgQueryResul
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AnimalPostForm {
-    name: String,
-    description: String,
-    content: String,
-    image_id_list: Vec<String>,
-    mobile_number: String,
+    pub name: String,
+    pub description: String,
+    pub content: String,
+    // TODO: use a more type-aware definition: Vec<String>
+    //  name: 'image_id_list[]' from Axios
+    pub image_id_list: String,
+    pub mobile_number: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

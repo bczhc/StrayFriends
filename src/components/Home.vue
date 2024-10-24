@@ -18,7 +18,10 @@ let showPostAnimalModal = ref(false);
         role="dialog"
         aria-modal="true"
     >
-      <PostAnimal @cancel="showPostAnimalModal = false"/>
+      <PostAnimal
+          @cancel="showPostAnimalModal = false"
+          @success="showPostAnimalModal = false"
+      />
     </n-card>
   </n-modal>
 

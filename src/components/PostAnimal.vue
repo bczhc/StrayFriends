@@ -15,7 +15,7 @@ let emit = defineEmits(['cancel', 'success']);
 
 let imagePreviewUrl = ref('');
 let showImageUploadingModal = ref(false);
-let imageFileList: Ref<UploadFileInfo[]> = ref();
+let imageFileList: Ref<UploadFileInfo[]> = ref([]);
 let submitOnProgress = ref(false);
 
 let naiveId2ServerId: Map<string, string> = new Map();
@@ -24,8 +24,15 @@ function uploadedImageIds() {
   return imageFileList.value.map(x => naiveId2ServerId.get(x.id)!!);
 }
 
+function checkInput() {
+  return name.value != ''
+      && description.value != ''
+      && imageFileList.value.length !== 0
+      && mobileNumber.value != '';
+}
+
 function submitClick() {
-  if (!name.value || !description.value || imageFileList.value.length === 0 || !mobileNumber.value) {
+  if (!checkInput()) {
     message.info('请完整输入');
     return;
   }
@@ -34,11 +41,11 @@ function submitClick() {
     name: name.value,
     description: description.value,
     content: content.value,
-    imageIdList: uploadedImageIds(),
+    imageIdList: JSON.stringify(uploadedImageIds()),
     mobileNumber: mobileNumber.value,
   }).then(r => {
     if (r.success()) {
-      message.success('提交成功');
+      message.success('发布成功');
       emit('success');
     } else {
       message.error(r.messageOrEmpty());
