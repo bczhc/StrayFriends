@@ -2,6 +2,7 @@ import {createApp} from "vue";
 import naive from 'naive-ui';
 import {router} from "./routes.ts";
 import AppRoot from "./AppRoot.vue";
+import {MessageApiInjection} from "naive-ui/es/message/src/MessageProvider";
 
 createApp(AppRoot)
     .use(router)
@@ -26,4 +27,8 @@ export const CHECK_DIGITS = x => /\d+/.test(x);
 
 export function formatDate(date: Date) {
     return date.toLocaleString();
+}
+
+export const messageError = (e: any, message: MessageApiInjection) => {
+    message.error(e.toString());
 }

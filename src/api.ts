@@ -47,7 +47,17 @@ const authedUrlencodedHeader = () => {
     };
 }
 
-export async function apiPost(url: string, form: object = {}) {
+async function resolveApiResponse(res: ApiResponse): Promise<object | null> {
+    return new Promise((resolve, reject) => {
+        if (res.success()) {
+            resolve(res.data);
+        } else {
+            reject(res.messageOrEmpty());
+        }
+    });
+}
+
+export async function apiPost(url: string, form: object = {}): Promise<object | null> {
     await delay(SIMULATE_API_DELAY);
     let axios = useAxios();
     console.log(url, form);
@@ -56,7 +66,8 @@ export async function apiPost(url: string, form: object = {}) {
         headers: authedUrlencodedHeader(),
     });
     console.log(result);
-    return ApiResponse.from(result.data);
+    let res = ApiResponse.from(result.data);
+    return resolveApiResponse(res);
 }
 
 export async function apiGet(url: string) {
@@ -66,7 +77,7 @@ export async function apiGet(url: string) {
         headers: authedUrlencodedHeader(),
     });
     console.log(result);
-    return ApiResponse.from(result.data);
+    return resolveApiResponse(ApiResponse.from(result.data));
 }
 
 export async function apiPut(url: string, form: object = {}) {
@@ -76,7 +87,7 @@ export async function apiPut(url: string, form: object = {}) {
         headers: authedUrlencodedHeader(),
     });
     console.log(result);
-    return ApiResponse.from(result.data);
+    return resolveApiResponse(ApiResponse.from(result.data));
 }
 
 export function parseNUploadOnFinishEvent(event: Event) {

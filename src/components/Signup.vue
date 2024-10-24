@@ -4,7 +4,7 @@ import {apiPost} from "../api.ts";
 import {useMessage} from "naive-ui";
 import SpinIndicator from "./SpinIndicator.vue";
 import PasswordConfirm from "./PasswordConfirm.vue";
-import {checkEmail} from "../main.ts";
+import {checkEmail, messageError} from "../main.ts";
 
 let emit = defineEmits<{
   back: [],
@@ -36,16 +36,10 @@ function signupClick() {
     name: name.value,
     email: email.value,
     password: password.value,
-  }).then((r) => {
-    if (r.success()) {
-      message.success(r.message || '注册成功');
-      emit('back');
-    } else {
-      message.error(r.messageOrEmpty());
-    }
-  }).catch(e => {
-    message.error(e.toString());
-  }).finally(() => {
+  }).then(_r => {
+    message.success('注册成功');
+    emit('back');
+  }).catch(e => messageError(e, message)).finally(() => {
     inProgress.value = false;
   });
 }

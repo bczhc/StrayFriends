@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref} from "vue";
-import {CHECK_DIGITS} from "../main.ts";
+import {CHECK_DIGITS, messageError} from "../main.ts";
 import {useDialog, useMessage} from 'naive-ui';
 import {apiPost} from "../api.ts";
 
@@ -39,18 +39,12 @@ function submitClick() {
       changeDialogLoading(true);
       return new Promise(resolve => {
         submit()
-            .then(r => {
-              if (r.success()) {
-                emit('success');
-                message.success('已提交申请');
-              } else {
-                message.error(r.messageOrEmpty());
-              }
+            .then(_r => {
+              emit('success');
+              message.success('已提交申请');
               resolve();
             })
-            .catch(e => {
-              message.error(e.toString());
-            })
+            .catch(e => messageError(e, message))
             .finally(() => {
               changeDialogLoading(false);
             })

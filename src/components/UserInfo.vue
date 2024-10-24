@@ -3,6 +3,7 @@ import {apiGet, apiPut, authHeaders, imageUrl, parseNUploadOnFinishEvent} from "
 import {Ref, ref} from "vue";
 import PasswordConfirm from "./PasswordConfirm.vue";
 import {useMessage} from 'naive-ui';
+import {messageError} from "../main.ts";
 
 let message = useMessage();
 
@@ -40,21 +41,15 @@ let avatarImageId: Ref<string | null> = ref(null);
 let loaded = ref(false);
 
 apiGet('/api/me').then(r => {
-  if (r.success()) {
-    let data = r.data;
-    console.log(data);
-    name.value = data['name'];
-    selectedGender.value = data['genderType'];
-    genderOther.value = data['genderOther'];
-    avatarImageId.value = data['avatarImageId'];
-    bio.value = data['bio'];
-    loaded.value = true;
-  } else {
-    message.error(r.messageOrEmpty());
-  }
-}).catch(e => {
-  message.error(e.toString());
-});
+  let data = r;
+  console.log(data);
+  name.value = data['name'];
+  selectedGender.value = data['genderType'];
+  genderOther.value = data['genderOther'];
+  avatarImageId.value = data['avatarImageId'];
+  bio.value = data['bio'];
+  loaded.value = true;
+}).catch(e => messageError(e, message));
 
 function updateInfoClick() {
   updating.value = true;
@@ -66,15 +61,9 @@ function updateInfoClick() {
     genderType: selectedGender.value,
     genderOther: genderOther.value,
     bio: bio.value,
-  }).then(r => {
-    if (r.success()) {
-      message.success('更新成功');
-    } else {
-      message.error(r.messageOrEmpty());
-    }
-  }).catch(x => {
-    message.error(x.toString());
-  }).finally(() => updating.value = false);
+  }).then(_r => {
+    message.success('更新成功');
+  }).catch(x => messageError(x, message)).finally(() => updating.value = false);
 }
 
 </script>

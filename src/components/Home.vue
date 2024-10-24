@@ -7,7 +7,7 @@ import PostAnimal from "./PostAnimal.vue";
 import {AnimalCardInfo, apiGet, imageUrl} from "../api.ts";
 import {useMessage} from 'naive-ui';
 import TextBanner from "./TextBanner.vue";
-import {formatDate} from "../main.ts";
+import {formatDate, messageError} from "../main.ts";
 
 const message = useMessage();
 
@@ -32,18 +32,12 @@ function fetchAndUpdateAnimals() {
   animalsLoading.value = true;
   apiGet(`/api/animals?offset=${(page.value - 1) * pageSize}&limit=${pageSize}`)
       .then(r => {
-        if (r.success()) {
-          let list = r.data['animals'] as AnimalCardInfo[];
-          animalCount.value = r.data['total'];
-          console.log(list);
-          animalCardInfoList.value = list;
-          animalsLoading.value = false;
-        } else {
-          message.error(r.messageOrEmpty())
-        }
-      }).catch(e => {
-    message.error(e.toString())
-  });
+        let list = r['animals'] as AnimalCardInfo[];
+        animalCount.value = r['total'];
+        console.log(list);
+        animalCardInfoList.value = list;
+        animalsLoading.value = false;
+      }).catch(e => messageError(e, message));
 }
 
 fetchAndUpdateAnimals();

@@ -9,7 +9,7 @@ import UserBox from "./UserBox.vue";
 import AdoptionRequest from "./AdoptionRequest.vue";
 import DateView from "./DateView.vue";
 import AdoptionStatus from "./AdoptionStatus.vue";
-import {formatDate} from "../main.ts";
+import {formatDate, messageError} from "../main.ts";
 
 const message = useMessage();
 
@@ -19,15 +19,9 @@ let animalId = route.params['id'];
 let animalInfo: Ref<AnimalCardInfo | null> = ref(null);
 
 apiGet(`/api/animal/${animalId}`).then(r => {
-  if (r.success()) {
-    console.log(r.data);
-    animalInfo.value = r.data as AnimalCardInfo;
-  } else {
-    message.error(r.messageOrEmpty());
-  }
-}).catch(e => {
-  message.error(e.toString());
-});
+  console.log(r);
+  animalInfo.value = r as AnimalCardInfo;
+}).catch(e => messageError(e, message));
 
 let showAdoptionModal = ref(false);
 </script>

@@ -3,7 +3,7 @@ import {useDialog, useMessage} from 'naive-ui';
 import {ref} from "vue";
 import SpinIndicator from "./SpinIndicator.vue";
 import {apiGet, apiPost, useAxios} from "../api.ts";
-import {delay} from "../main.ts";
+import {delay, messageError} from "../main.ts";
 import {useRoute, useRouter} from "vue-router";
 import {JWT_GET, JWT_STORE} from "../jwt.ts";
 
@@ -31,20 +31,14 @@ function loginClick() {
     username: email.value,
     password: password.value,
   }).then(r => {
-    if (r.success()) {
-      inProgress.value = false;
-      loginSuccess.value = true;
-      let token = r.data as string;
-      JWT_STORE(token);
-      delay(1000).then(() => {
-        router.push('/home');
-      });
-    } else {
-      message.error(r.messageOrEmpty());
-    }
-  }).catch(_ => {
-    message.error('请求失败');
-  }).finally(() => {
+    inProgress.value = false;
+    loginSuccess.value = true;
+    let token = r as string;
+    JWT_STORE(token);
+    delay(1000).then(() => {
+      router.push('/home');
+    });
+  }).catch(x => messageError(x, message)).finally(() => {
     inProgress.value = false;
   });
 }
@@ -59,10 +53,10 @@ if (route.query['type'] === 'logout') {
 
 let token = JWT_GET();
 // go to Home page if the token is validated
-apiGet('/api/me').then(r => {
-  if (r.success()) {
-    router.push('/home');
-  }
+apiGet('/api/me').then(_r => {
+  router.push('/home');
+}).catch(_r => {
+  // ignored
 })
 </script>
 

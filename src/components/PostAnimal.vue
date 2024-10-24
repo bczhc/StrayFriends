@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {Ref, ref} from "vue";
-import {CHECK_DIGITS} from "../main.ts";
+import {CHECK_DIGITS, messageError} from "../main.ts";
 import {UploadFileInfo, useMessage} from "naive-ui";
 import {apiPost, authHeaders, imageUrl, parseNUploadOnFinishEvent} from "../api.ts";
 
@@ -43,16 +43,10 @@ function submitClick() {
     content: content.value,
     imageIdList: JSON.stringify(uploadedImageIds()),
     mobileNumber: mobileNumber.value,
-  }).then(r => {
-    if (r.success()) {
-      message.success('发布成功');
-      emit('success');
-    } else {
-      message.error(r.messageOrEmpty());
-    }
-  }).catch(e => {
-    message.error(e.toString());
-  }).finally(() => {
+  }).then(_r => {
+    message.success('发布成功');
+    emit('success');
+  }).catch(e => messageError(e, message)).finally(() => {
     submitOnProgress.value = false;
   });
 }
