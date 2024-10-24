@@ -5,8 +5,14 @@ import {useRouter} from "vue-router";
 import UserBox from "./UserBox.vue";
 import AdoptionStatus from "./AdoptionStatus.vue";
 import DateView from "./DateView.vue";
+import {checkAdmin} from "../jwt.ts";
+import {apiDelete, apiPatch} from "../api.ts";
+import {useMessage} from 'naive-ui';
+import {messageError} from "../main.ts";
 
-let emit = defineEmits(['imageClick', 'adoptionClick', 'userProfileClick'])
+const message = useMessage();
+
+let emit = defineEmits(['imageClick', 'adoptionClick', 'userProfileClick', 'update'])
 let router = useRouter();
 
 let showAdoptionModal = ref(false);
@@ -29,6 +35,30 @@ const props = defineProps<{
 }>();
 
 let loading = computed(() => props.loading);
+
+type OptionKey = 'delete' | 'mark as adopted';
+
+let operationsOptions: { key: OptionKey, label: string }[] = [
+  {key: 'delete', label: '删除'},
+  {key: 'mark as adopted', label: '标记为已领养'},
+];
+
+function operationsOnSelected(key: OptionKey) {
+  let f = async () => {
+    switch (key) {
+      case "delete":
+        await apiDelete(`/api/animal/${props.postId}`);
+        break;
+      case "mark as adopted":
+        await apiPatch(`/api/animal/${props.postId}/adopt`);
+        break;
+    }
+  };
+  f().then(_r => {
+    message.success('操作成功');
+    emit('update');
+  }).catch(e => messageError(e, message));
+}
 </script>
 
 <template>
@@ -77,7 +107,12 @@ let loading = computed(() => props.loading);
                @click="emit('userProfileClick')"
       />
 
-      <n-button @click="adoptionClick" :disabled="loading">申请领养</n-button>
+      <div>
+        <n-dropdown v-if="checkAdmin()" :options="operationsOptions" @select="operationsOnSelected" trigger="click">
+          <n-button v-if="checkAdmin()" :disabled="loading">操作</n-button>
+        </n-dropdown>
+        <n-button @click="adoptionClick" :disabled="loading">申请领养</n-button>
+      </div>
     </div>
     <div id="date-line">
       <DateView>{{ props.date }}</DateView>
