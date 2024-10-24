@@ -104,7 +104,7 @@ pub async fn set_adopted(
     path: Path<(RowId,)>,
 ) -> impl IntoResponse {
     let r: anyhow::Result<_> = try {
-        let claims = validate_token_admin!(auth);
+        let claims = validate_token!(auth);
         check_owned_or_admin!(claims, path.0 .0, &ext.db);
         sqlx::query(include_sql!("animal-set-adopted"))
             .bind(path.0 .0)
@@ -122,7 +122,7 @@ pub async fn delete(
     path: Path<(RowId,)>,
 ) -> impl IntoResponse {
     let r: anyhow::Result<_> = try {
-        let claims = validate_token_admin!(auth);
+        let claims = validate_token!(auth);
         check_owned_or_admin!(claims, path.0 .0, &ext.db);
         sqlx::query(include_sql!("animal-delete"))
             .bind(path.0 .0)

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref} from "vue";
-import {apiGet, User} from "../api.ts";
+import {apiGet, imageUrl, User} from "../api.ts";
 import {genderDisplay} from "../main.ts";
 
 const props = defineProps<{
@@ -18,7 +18,7 @@ apiGet(`/api/user/${props.userId}`).then(r => {
 <template>
   <!-- TODO: in-progress feedback -->
   <div v-if="user" id="root">
-    <n-avatar :src="'/avatar-demo.jpg'" id="avatar"/>
+    <n-avatar :src="imageUrl(user.avatarImageId)" id="avatar"/>
     <n-h5 class="label">用户名：{{ user.name }}</n-h5>
     <n-h5 class="label">邮箱：{{ user.email }}</n-h5>
     <n-h5 class="label">性别：{{ genderDisplay(user) }}</n-h5>
