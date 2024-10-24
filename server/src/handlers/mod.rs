@@ -1,5 +1,6 @@
 mod account;
 mod upload;
+mod animal;
 
 use crate::mutex_lock;
 use axum::response::IntoResponse;
@@ -30,6 +31,7 @@ pub fn router() -> Router {
     add_route!(router, POST "/image/upload", upload::upload_image);
     add_route!(router, GET "/image/:id", upload::image);
     add_route!(router, PUT "/me", account::update_info);
+    add_route!(router, POST "/animal", animal::post_animal);
     router
 }
 

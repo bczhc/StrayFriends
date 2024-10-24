@@ -21,3 +21,5 @@ export function delay(ms: number) {
         }, ms);
     });
 }
+
+export const CHECK_DIGITS = x => /\d+/.test(x);

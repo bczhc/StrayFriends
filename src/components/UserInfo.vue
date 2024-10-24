@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {apiGet, apiPut, authHeaders} from "../api.ts";
+import {apiGet, apiPut, authHeaders, imageUrl, parseNUploadOnFinishEvent} from "../api.ts";
 import {Ref, ref} from "vue";
 import PasswordConfirm from "./PasswordConfirm.vue";
 import {useMessage} from 'naive-ui';
@@ -102,16 +102,14 @@ function updateInfoClick() {
           action="/api/image/upload"
           :headers="authHeaders()"
           @finish="x => {
-            let resText = (x.event.target as XMLHttpRequest).response;
-            let res = JSON.parse(resText);
-            let digest = res['data'];
+            let digest = parseNUploadOnFinishEvent(x.event).digest;
             avatarImageId = digest;
             console.log(digest);
             console.log(res);
           }"
       >
         <n-avatar size="large" round
-                  :src="`/api/image/${avatarImageId}`"/>
+                  :src="imageUrl(avatarImageId)"/>
       </n-upload>
     </n-form-item>
     <n-form-item label="原密码">

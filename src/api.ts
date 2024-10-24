@@ -78,3 +78,15 @@ export async function apiPut(url: string, form: object = {}) {
     console.log(result);
     return ApiResponse.from(result.data);
 }
+
+export function parseNUploadOnFinishEvent(event: Event) {
+    let resText = (event.target as XMLHttpRequest).response;
+    let res = JSON.parse(resText);
+    return {
+        digest: res['data']
+    };
+}
+
+export function imageUrl(digest: string) {
+    return `/api/image/${digest}`;
+}

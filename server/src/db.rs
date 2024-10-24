@@ -2,9 +2,9 @@ use crate::{include_sql, random_string};
 use serde::{Deserialize, Serialize};
 use sqlx::encode::IsNull;
 use sqlx::error::BoxDynError;
+use sqlx::postgres::PgQueryResult;
 use sqlx::{Database, Decode, Encode, Error, FromRow, PgPool, Postgres, Type};
 use std::ops::Deref;
-use sqlx::postgres::PgQueryResult;
 use strum::AsRefStr;
 
 const PASSWORD_SALT_LENGTH: usize = 16;
@@ -123,7 +123,18 @@ pub async fn change_password(db: &PgPool, new: &Password) -> Result<PgQueryResul
     sqlx::query(include_sql!("update-user-info"))
         .bind(&new.blake3)
         .bind(&new.salt)
-        .execute(db).await
+        .execute(db)
+        .await
+}
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AnimalPostForm {
+    name: String,
+    description: String,
+    content: String,
+    image_id_list: Vec<String>,
+    mobile_number: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

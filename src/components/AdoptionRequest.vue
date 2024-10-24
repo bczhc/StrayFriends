@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {ref} from "vue";
+import {CHECK_DIGITS} from "../main.ts";
 
 let reason = ref('');
 let mobileNumber = ref('');
@@ -17,7 +18,7 @@ let emit = defineEmits(['cancel']);
       <n-input type="textarea" rows="7" v-model:value="reason"/>
     </n-form-item>
     <n-form-item label="联系电话" required>
-      <n-input :allow-input="x => /\d+/.test(x)" v-model:value="mobileNumber"/>
+      <n-input :allow-input="CHECK_DIGITS" v-model:value="mobileNumber"/>
     </n-form-item>
     <n-space justify="end">
       <n-button type="primary" secondary @click="emit('cancel')">取消</n-button>

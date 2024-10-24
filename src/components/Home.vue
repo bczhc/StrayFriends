@@ -2,9 +2,26 @@
 
 import Header from "./Header.vue";
 import AnimalCard from "./AnimalCard.vue";
+import {ref} from "vue";
+import PostAnimal from "./PostAnimal.vue";
+
+let showPostAnimalModal = ref(false);
 </script>
 
 <template>
+  <n-modal v-model:show="showPostAnimalModal">
+    <n-card
+        style="width: 600px"
+        title="发布"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+    >
+      <PostAnimal @cancel="showPostAnimalModal = false"/>
+    </n-card>
+  </n-modal>
+
   <Header/>
   <div id="header">
     <n-text class="display-large">
@@ -17,7 +34,7 @@ import AnimalCard from "./AnimalCard.vue";
         <span>最新发布</span>
       </div>
       <div class="right-div">
-        <n-button type="primary">发布</n-button>
+        <n-button type="primary" @click="showPostAnimalModal = true">发布</n-button>
       </div>
     </div>
     <div id="card-layout">
