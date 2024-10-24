@@ -64,3 +64,12 @@ export function confirmApiRequest(
         },
     });
 }
+
+export function normalizeBase64(base64: string) {
+    let normalized = `${base64}`;
+    // https://stackoverflow.com/a/63944181/11905139
+    if (normalized.length % 4 > 0) {
+        normalized += '='.repeat(4 - normalized.length % 4)
+    }
+    return normalized
+}

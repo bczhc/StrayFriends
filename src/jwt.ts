@@ -1,5 +1,6 @@
 import * as base64 from "base64-js";
 import {User} from "./api.ts";
+import {normalizeBase64} from "./main.ts";
 
 const JWT_LOCAL_STORAGE_KEY = "jwt-token";
 
@@ -22,7 +23,7 @@ export let JWT_GET_CLAIMS = () => {
     if (!token) return null;
 
     let claimsBase64 = token.split('.')[1];
-    let claims = new TextDecoder().decode(base64.toByteArray(claimsBase64));
+    let claims = new TextDecoder().decode(base64.toByteArray(normalizeBase64(claimsBase64)));
     try {
         return JSON.parse(claims) as Claims;
     } catch (e: any) {
