@@ -105,7 +105,7 @@ function operationOnSelected(key: DropdownKey) {
                           @select="operationOnSelected">
                 <n-button>操作</n-button>
               </n-dropdown>
-              <n-button>爱心捐赠</n-button>
+              <n-button v-if="false">爱心捐赠</n-button>
               <n-button @click="showAdoptionModal = true" :disabled="animalInfo.adopted">申请领养</n-button>
             </div>
           </div>
