@@ -6,7 +6,7 @@ use anyhow::anyhow;
 use axum::extract::{Query, RawQuery};
 use axum::response::IntoResponse;
 use axum::{debug_handler, Form};
-use serde_with::serde_derive::{Serialize, Deserialize};
+use serde_with::serde_derive::{Deserialize, Serialize};
 
 #[debug_handler]
 pub async fn post_animal(
@@ -43,6 +43,12 @@ pub struct ListQuery {
     pub pagination: PaginationQuery,
 }
 
+#[derive(Serialize, Debug)]
+pub struct ListResponse {
+    total: i64,
+    animals: Vec<AnimalInfoQueryRow>,
+}
+
 #[debug_handler]
 pub async fn list(ext: ApiExtension, query: RawQuery) -> impl IntoResponse {
     let r: anyhow::Result<_> = try {
@@ -55,7 +61,16 @@ pub async fn list(ext: ApiExtension, query: RawQuery) -> impl IntoResponse {
             .bind(limit)
             .fetch_all(db)
             .await?;
-        return api_ok!(animals);
+
+        let count: (i64,) = sqlx::query_as(include_sql!("count-animals"))
+            .fetch_one(db)
+            .await?;
+
+        let response = ListResponse {
+            total: count.0,
+            animals,
+        };
+        return api_ok!(response);
     };
     handle_errors!(r)
 }

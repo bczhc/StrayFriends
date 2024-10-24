@@ -2,7 +2,7 @@
 
 import Header from "./Header.vue";
 import AnimalCard from "./AnimalCard.vue";
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import PostAnimal from "./PostAnimal.vue";
 import {apiGet, imageUrl} from "../api.ts";
 import {useMessage} from 'naive-ui';
@@ -25,25 +25,36 @@ let animalsLoading = ref(true);
 
 let animalCardInfoList = ref<AnimalCardInfo[]>([])
 
-// let queryOffset = ref(0);
-// let queryLimit = ref(0);
+let pageSize = 10;
+let page = ref(1);
+let animalCount = ref(pageSize);
 
-let queryOffset = 0;
-let queryLimit = 10;
+let pageCount = computed(() => {
+  if (animalCount.value % pageSize === 0) {
+    return animalCount.value / pageSize;
+  }
+  return Math.floor(animalCount.value / pageSize) + 1;
+});
 
-apiGet(`/api/animals?offset=${queryOffset}&limit=${queryLimit}`)
-    .then(r => {
-      if (r.success()) {
-        let list = r.data as AnimalCardInfo[];
-        console.log(list);
-        animalCardInfoList.value = list;
-        animalsLoading.value = false;
-      } else {
-        message.error(r.messageOrEmpty())
-      }
-    }).catch(e => {
-  message.error(e.toString())
-})
+function fetchAndUpdateAnimals() {
+  animalsLoading.value = true;
+  apiGet(`/api/animals?offset=${(page.value - 1) * pageSize}&limit=${pageSize}`)
+      .then(r => {
+        if (r.success()) {
+          let list = r.data['animals'] as AnimalCardInfo[];
+          animalCount.value = r.data['total'];
+          console.log(list);
+          animalCardInfoList.value = list;
+          animalsLoading.value = false;
+        } else {
+          message.error(r.messageOrEmpty())
+        }
+      }).catch(e => {
+    message.error(e.toString())
+  });
+}
+
+fetchAndUpdateAnimals();
 </script>
 
 <template>
@@ -58,7 +69,7 @@ apiGet(`/api/animals?offset=${queryOffset}&limit=${queryLimit}`)
     >
       <PostAnimal
           @cancel="showPostAnimalModal = false"
-          @success="showPostAnimalModal = false"
+          @success="showPostAnimalModal = false; fetchAndUpdateAnimals()"
       />
     </n-card>
   </n-modal>
@@ -81,7 +92,7 @@ apiGet(`/api/animals?offset=${queryOffset}&limit=${queryLimit}`)
     <div id="card-layout">
       <!-- show skeletons -->
       <AnimalCard v-if="animalsLoading"
-                  v-for="() in Array(queryLimit)"
+                  v-for="() in Array(pageSize)"
                   loading
       />
       <AnimalCard
@@ -95,6 +106,9 @@ apiGet(`/api/animals?offset=${queryOffset}&limit=${queryLimit}`)
           :loading="false"
       />
     </div>
+    <n-pagination v-model:page="page" :page-count="pageCount"
+                  @update:page="fetchAndUpdateAnimals"
+    />
   </div>
 </template>
 

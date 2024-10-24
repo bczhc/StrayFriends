@@ -89,7 +89,7 @@ let loading = computed(() => props.loading);
 #parent {
   display: inline-block;
   padding: .8em;
-  width: 20em;
+  width: 25em;
   background-color: white;
   transition: margin-top 0.2s ease-in-out;
   border-radius: 5px;
