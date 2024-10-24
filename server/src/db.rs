@@ -145,7 +145,7 @@ pub struct AnimalPostForm {
 pub struct AnimalInfoQueryRow {
     pub post_id: RowId,
     pub username: String,
-    pub user_avatar_image_id: String,
+    pub user_avatar_image_id: Option<String>,
     pub name: String,
     pub description: String,
     pub content: String,

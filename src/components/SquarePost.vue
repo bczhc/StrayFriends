@@ -4,7 +4,7 @@ import {apiDelete, apiGet, imageUrl, SquarePost, User} from "../api.ts";
 import {computed, ref, Ref} from "vue";
 import {confirmApiRequest, formatDate, messageError} from "../main.ts";
 import UserBox from "./UserBox.vue";
-import {checkOwned} from "../jwt.ts";
+import {checkAdmin, checkOwned} from "../jwt.ts";
 import {useRouter} from "vue-router";
 
 const message = useMessage();
@@ -21,7 +21,7 @@ let owned = computed(() => checkOwned(square.value.postUid));
 
 async function fetch() {
   userRef.value = await apiGet(`/api/user/${square.value.postUid}`);
-  if (!owned.value) {
+  if (!checkAdmin() && !owned.value) {
     // no permission to operate
     dropdownOptions = [];
   }
