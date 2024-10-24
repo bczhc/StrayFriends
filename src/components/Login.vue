@@ -71,10 +71,10 @@ apiGet('/api/me').then(r => {
     <n-h5>登录</n-h5>
     <n-form id="form" size="large">
       <n-form-item label="邮箱">
-        <n-input v-model:value="email"/>
+        <n-input v-model:value="email" v-on:keyup.enter="loginClick"/>
       </n-form-item>
       <n-form-item label="密码">
-        <n-input type="password" v-model:value="password"/>
+        <n-input type="password" v-model:value="password" v-on:keyup.enter="loginClick"/>
       </n-form-item>
       <n-space justify="space-evenly" size="large">
         <n-button size="large" @click="signupClick">注册</n-button>
