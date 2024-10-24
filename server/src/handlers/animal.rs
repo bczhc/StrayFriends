@@ -1,6 +1,6 @@
 use crate::db::{AnimalInfoQueryRow, AnimalPostForm, RowId};
 use crate::handlers::{handle_errors, PaginationQuery};
-use crate::jwt::validate_token;
+use crate::jwt::{validate_token, validate_token_admin};
 use crate::{api_ok, include_sql, ApiExtension, AuthHeader};
 use anyhow::anyhow;
 use axum::extract::{Path, Query, RawQuery};
@@ -88,6 +88,40 @@ pub async fn query_animal_post(ext: ApiExtension, Path(path): Path<(RowId,)>) ->
             .ok_or_else(|| anyhow!("未找到记录"))?;
 
         return api_ok!(animal_info);
+    };
+    handle_errors!(r)
+}
+
+#[debug_handler]
+pub async fn set_adopted(
+    ext: ApiExtension,
+    auth: AuthHeader,
+    path: Path<(RowId,)>,
+) -> impl IntoResponse {
+    let r: anyhow::Result<_> = try {
+        let claims = validate_token_admin!(auth);
+        sqlx::query(include_sql!("animal-set-adopted"))
+            .bind(path.0 .0)
+            .execute(&ext.db)
+            .await?;
+        return api_ok!(());
+    };
+    handle_errors!(r)
+}
+
+#[debug_handler]
+pub async fn delete(
+    ext: ApiExtension,
+    auth: AuthHeader,
+    path: Path<(RowId,)>,
+) -> impl IntoResponse {
+    let r: anyhow::Result<_> = try {
+        let claims = validate_token_admin!(auth);
+        sqlx::query(include_sql!("animal-delete"))
+            .bind(path.0 .0)
+            .execute(&ext.db)
+            .await?;
+        return api_ok!(());
     };
     handle_errors!(r)
 }

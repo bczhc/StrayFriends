@@ -90,6 +90,26 @@ export async function apiPut(url: string, form: object = {}) {
     return resolveApiResponse(ApiResponse.from(result.data));
 }
 
+export async function apiDelete(url: string) {
+    await delay(SIMULATE_API_DELAY);
+    let axios = useAxios();
+    let result: AxiosResponse<any> = await axios.delete(url, {
+        headers: authedUrlencodedHeader(),
+    });
+    console.log(result);
+    return resolveApiResponse(ApiResponse.from(result.data));
+}
+
+export async function apiPatch(url: string, form: object = {}) {
+    await delay(SIMULATE_API_DELAY);
+    let axios = useAxios();
+    let result: AxiosResponse<any> = await axios.patch(url, form, {
+        headers: authedUrlencodedHeader(),
+    });
+    console.log(result);
+    return resolveApiResponse(ApiResponse.from(result.data));
+}
+
 export function parseNUploadOnFinishEvent(event: Event) {
     let resText = (event.target as XMLHttpRequest).response;
     let res = JSON.parse(resText);

@@ -2,7 +2,7 @@ use crate::db::{AdoptionRequestQueryRow, PgCount, RowId};
 use crate::handlers::{handle_errors, PaginationQuery};
 use crate::jwt::{validate_token, validate_token_admin};
 use crate::{api_ok, include_sql, ApiExtension, AuthHeader};
-use axum::extract::Query;
+use axum::extract::{Path, Query};
 use axum::response::IntoResponse;
 use axum::Form;
 use serde::Deserialize;
@@ -58,10 +58,7 @@ pub async fn list_requests(
     handle_errors!(r)
 }
 
-pub async fn count(
-    ext: ApiExtension,
-    auth: AuthHeader,
-) -> impl IntoResponse {
+pub async fn count(ext: ApiExtension, auth: AuthHeader) -> impl IntoResponse {
     let r: anyhow::Result<_> = try {
         let claims = validate_token_admin!(auth);
 
@@ -70,6 +67,22 @@ pub async fn count(
             .await?;
 
         return api_ok!(count);
+    };
+    handle_errors!(r)
+}
+
+pub async fn delete(
+    ext: ApiExtension,
+    auth: AuthHeader,
+    path: Path<(RowId,)>,
+) -> impl IntoResponse {
+    let r: anyhow::Result<_> = try {
+        let claims = validate_token_admin!(auth);
+        sqlx::query(include_sql!("delete-adoption-request"))
+            .bind(path.0 .0)
+            .execute(&ext.db)
+            .await?;
+        return api_ok!(());
     };
     handle_errors!(r)
 }

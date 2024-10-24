@@ -71,6 +71,7 @@ pub macro validate_token($auth_header:expr) {{
     claims
 }}
 
+/// Validate JWT token and check if the user is _admin_.
 pub macro validate_token_admin($auth_header:expr) {{
     let claims = crate::jwt::validate_token!($auth_header);
     if !claims.user.admin {
