@@ -6,7 +6,7 @@ import AdoptionRequestListView from "./AdoptionRequestListView.vue";
 import {AdoptionRequest, apiGet} from "../api.ts";
 import {useMessage} from 'naive-ui';
 import {ref} from "vue";
-import {messageError} from "../main.ts";
+import {messageError, paginationCount} from "../main.ts";
 
 const message = useMessage();
 
@@ -21,12 +21,8 @@ async function fetch() {
   totalCount.value = r;
 
   r = await apiGet(`/api/adoptions/list?offset=${page.value * pageSize}&limit=${pageSize}`);
+  list.value = r;
   console.log(r);
-  let list = r as AdoptionRequest[];
-  for (let x of list) {
-    let animal = await apiGet(`/api/animal/${x.animalPostId}`);
-    console.log(animal);
-  }
 }
 
 fetch().catch(e => messageError(e, message));
@@ -37,10 +33,17 @@ fetch().catch(e => messageError(e, message));
   <TextBanner height="100px" text="申请批准" font-size="3em"/>
 
   <div id="adoption-list">
-    <AdoptionRequestListView/>
-    <AdoptionRequestListView/>
-    <AdoptionRequestListView/>
+    <AdoptionRequestListView
+        v-for="x in list"
+        :animal-id="x.animalPostId"
+        :post-uid="x.postUid"
+        :mobile-number="x.mobileNumber"
+        :request-details="x.requestDetails"
+    />
   </div>
+  <n-pagination v-model:page="page"
+                :page-count="paginationCount(totalCount, pageSize)"
+  />
 </template>
 
 <style scoped lang="scss">

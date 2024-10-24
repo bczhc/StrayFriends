@@ -4,6 +4,7 @@ let emit = defineEmits(['click']);
 const props = defineProps<{
   avatarImage: string,
   username: string,
+  mobileNumber?: string,
 }>();
 </script>
 
@@ -11,7 +12,10 @@ const props = defineProps<{
   <div id="username-div" @click="emit('userProfileClick')">
     <n-avatar :src="props.avatarImage" round/>
 
-    <span id="username-text">{{ props.username }}</span>
+    <div id="username-text">
+      <span>{{ props.username }}</span>
+      <span v-if="props.mobileNumber">{{ props.mobileNumber }}</span>
+    </div>
   </div>
 </template>
 
@@ -30,5 +34,10 @@ const props = defineProps<{
 
 #username-div > *:nth-child(2) {
   margin-left: .5em;
+}
+
+#username-text {
+  display: inline-flex;
+  gap: 1em;
 }
 </style>

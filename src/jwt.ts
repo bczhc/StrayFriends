@@ -1,4 +1,5 @@
 import * as base64 from "base64-js";
+import {User} from "./api.ts";
 
 const JWT_LOCAL_STORAGE_KEY = "jwt-token";
 
@@ -31,14 +32,6 @@ export let JWT_GET_CLAIMS = () => {
 
 interface Claims {
     user: User,
-}
-
-interface User {
-    id: number,
-    name: string,
-    email: string,
-    avatarImageId?: string,
-    admin: boolean,
 }
 
 export function checkAdmin() {

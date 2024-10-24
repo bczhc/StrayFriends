@@ -32,3 +32,10 @@ export function formatDate(date: Date) {
 export const messageError = (e: any, message: MessageApiInjection) => {
     message.error(e.toString());
 }
+
+export function paginationCount(total: number, pageSize: number) {
+    if (total % pageSize === 0) {
+        return total / pageSize;
+    }
+    return Math.floor(total / pageSize) + 1;
+}

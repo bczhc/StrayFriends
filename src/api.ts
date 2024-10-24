@@ -2,7 +2,7 @@ import axios, {AxiosResponse} from "axios";
 import {JWT_GET} from "./jwt.ts";
 import {delay} from "./main.ts";
 
-const SIMULATE_API_DELAY = 500 /* 500ms */;
+const SIMULATE_API_DELAY = 0;
 
 export class ApiResponse {
     code: number;
@@ -120,4 +120,15 @@ export interface AdoptionRequest {
     animalPostId: number,
     requestDetails: string,
     mobileNumber: string,
+}
+
+export interface User {
+    id: number,
+    name: string,
+    email: string,
+    avatarImageId?: string,
+    admin: boolean,
+    genderType: string,
+    genderOther: string,
+    bio: string,
 }

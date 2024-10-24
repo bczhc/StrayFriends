@@ -13,6 +13,7 @@ use axum_extra::{headers, TypedHeader};
 use serde::Deserialize;
 use sqlx::{query, Executor, PgPool};
 use std::sync::Arc;
+use axum::extract::Path;
 use log::debug;
 
 #[derive(Deserialize, Debug)]
@@ -108,6 +109,14 @@ async fn query_user(db: &PgPool, uid: RowId) -> anyhow::Result<User> {
         .fetch_one(db)
         .await?;
     Ok(user)
+}
+
+pub async fn query_user_api(ext: ApiExtension, path: Path<(RowId,)>) -> impl IntoResponse {
+    let r: anyhow::Result<_> = try {
+        let user = query_user(&ext.db, path.0.0).await?;
+        return api_ok!(user);
+    };
+    handle_errors!(r)
 }
 
 #[debug_handler]

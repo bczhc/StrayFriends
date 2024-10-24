@@ -7,7 +7,7 @@ import PostAnimal from "./PostAnimal.vue";
 import {AnimalCardInfo, apiGet, imageUrl} from "../api.ts";
 import {useMessage} from 'naive-ui';
 import TextBanner from "./TextBanner.vue";
-import {formatDate, messageError} from "../main.ts";
+import {formatDate, messageError, paginationCount} from "../main.ts";
 
 const message = useMessage();
 
@@ -22,10 +22,7 @@ let page = ref(1);
 let animalCount = ref(pageSize);
 
 let pageCount = computed(() => {
-  if (animalCount.value % pageSize === 0) {
-    return animalCount.value / pageSize;
-  }
-  return Math.floor(animalCount.value / pageSize) + 1;
+  return paginationCount(animalCount.value, pageSize);
 });
 
 function fetchAndUpdateAnimals() {
