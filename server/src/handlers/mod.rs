@@ -1,6 +1,7 @@
 mod account;
 mod animal;
 mod upload;
+mod adoption;
 
 use crate::mutex_lock;
 use axum::response::IntoResponse;
@@ -36,6 +37,7 @@ pub fn router() -> Router {
     add_route!(router, PUT "/me", account::update_info);
     add_route!(router, POST "/animal", animal::post_animal);
     add_route!(router, GET "/animals", animal::list);
+    add_route!(router, POST "/adoption", adoption::file_adoption_request);
     router
 }
 
@@ -71,14 +73,14 @@ pub async fn test_api() -> impl IntoResponse {
 }
 
 /// The common pagination query parameters
-/// 
+///
 /// With `serde(flatten)`, query deserialization can't be handled well,
 /// I have to use this ugly workaround.
-/// 
+///
 /// When using the workaround, note `Serialize` and `Deserialize` traits
 /// are from decent `serde_with::serde_derive::{Serialize, Deserialize}` instead,
 /// not from `serde`.
-/// 
+///
 /// https://github.com/nox/serde_urlencoded/issues/33#issuecomment-629803582
 #[serde_as]
 #[derive(Deserialize, Debug, Eq, PartialEq)]

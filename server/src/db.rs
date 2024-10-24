@@ -142,6 +142,7 @@ pub struct AnimalPostForm {
 #[derive(Serialize, Debug, FromRow)]
 #[serde(rename_all = "camelCase")]
 pub struct AnimalInfoQueryRow {
+    pub post_id: RowId,
     pub username: String,
     pub user_avatar_image_id: String,
     pub name: String,
@@ -198,7 +199,9 @@ macro impl_uint($pg_ty:ty, $rs_ty:ty) {
 impl_uint!(i32, u32);
 impl_uint!(i64, u64);
 
-pub type Uid = i64;
+/// Type `SERIAL` in PgSQL.
+pub type RowId = i64;
+pub type Uid = RowId;
 
 #[cfg(test)]
 mod test {

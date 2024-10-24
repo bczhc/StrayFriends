@@ -20,6 +20,7 @@ const props = defineProps<{
   userAvatarImage?: string,
   username?: string,
   loading?: boolean,
+  postId: number,
 }>();
 
 let loading = computed(() => props.loading);
@@ -35,7 +36,10 @@ let loading = computed(() => props.loading);
         role="dialog"
         aria-modal="true"
     >
-      <AdoptionRequest @cancel="showAdoptionModal = false"/>
+      <AdoptionRequest @cancel="showAdoptionModal = false"
+                       @success="showAdoptionModal = false"
+                       :post-id="props.postId"
+      />
     </n-card>
   </n-modal>
 

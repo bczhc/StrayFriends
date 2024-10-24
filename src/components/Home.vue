@@ -19,6 +19,7 @@ interface AnimalCardInfo {
   content: string,
   creationTime: number,
   imageIdList: string[],
+  postId: number,
 }
 
 let animalsLoading = ref(true);
@@ -94,6 +95,7 @@ fetchAndUpdateAnimals();
       <AnimalCard v-if="animalsLoading"
                   v-for="() in Array(pageSize)"
                   loading
+                  :post-id="0"
       />
       <AnimalCard
           v-else
@@ -104,6 +106,7 @@ fetchAndUpdateAnimals();
           :user-avatar-image="imageUrl(x.userAvatarImageId)"
           :username="x.username"
           :loading="false"
+          :post-id="x.postId"
       />
     </div>
     <n-pagination v-model:page="page" :page-count="pageCount"
