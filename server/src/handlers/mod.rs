@@ -49,6 +49,7 @@ pub fn router() -> Router {
     /* ====================== OWNER OR ADMIN ====================== */
     add_route!(router, PATCH "/animal/:id/adopt", animal::set_adopted);
     add_route!(router, DELETE "/animal/:id", animal::delete);
+    add_route!(router, DELETE "/square/:id", square::delete);
     /* ====================== ADMIN ====================== */
     add_route!(router, GET "/adoptions/count", adoption::count);
     add_route!(router, GET "/adoptions/list", adoption::list_requests);
@@ -106,6 +107,20 @@ pub struct PaginationQuery {
     #[serde_as(as = "DisplayFromStr")]
     limit: i32,
 }
+
+pub macro check_owned_or_admin($claims:expr, $post_id:expr, $db:expr, $ck_sql:literal) {{
+    if (!$claims.user.admin) {
+        let (owned,): (bool,) = sqlx::query_as(crate::include_sql!($ck_sql))
+        .bind($post_id)
+        .bind($claims.uid)
+        .fetch_optional($db)
+        .await?
+        .unwrap_or((false,));
+        if !owned {
+            crate::jwt::axum_return_unauthorized!();
+        }
+    }
+}}
 
 #[cfg(test)]
 mod test {

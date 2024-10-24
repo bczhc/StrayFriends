@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import {useMessage} from 'naive-ui';
-import {apiGet, imageUrl, SquarePost, User} from "../api.ts";
+import {useDialog, useMessage} from 'naive-ui';
+import {apiDelete, apiGet, imageUrl, SquarePost, User} from "../api.ts";
 import {computed, ref, Ref} from "vue";
-import {formatDate, messageError} from "../main.ts";
+import {confirmApiRequest, formatDate, messageError} from "../main.ts";
 import UserBox from "./UserBox.vue";
+import {checkOwned} from "../jwt.ts";
+import {useRouter} from "vue-router";
 
 const message = useMessage();
+const dialog = useDialog();
+const router = useRouter();
 
 const props = defineProps<{
   square: SquarePost,
@@ -13,12 +17,46 @@ const props = defineProps<{
 
 let square = computed(() => props.square);
 let userRef: Ref<User | null> = ref(null);
+let owned = computed(() => checkOwned(square.value.postUid));
 
 async function fetch() {
   userRef.value = await apiGet(`/api/user/${square.value.postUid}`);
+  if (!owned.value) {
+    // no permission to operate
+    dropdownOptions = [];
+  }
 }
 
 fetch().then().catch(e => messageError(e, message));
+
+type DropdownKey = 'delete';
+
+let dropdownOptions: { key: DropdownKey, label: string }[] = [
+  {key: 'delete', label: '删除'},
+];
+
+function dropdownOnSelected(key: DropdownKey) {
+  switch (key) {
+    case "delete":
+      confirmApiRequest(
+          dialog,
+          '删除',
+          '是否删除？',
+          finish => {
+            apiDelete(`/api/square/${square.value.id}`)
+                .then(() => {
+                  message.success('操作成功');
+                  // TODO: avoid hard refreshing the page
+                  //  a way to go: notify the parent -> re-fetch
+                  router.go();
+                })
+                .catch(e => messageError(e, message))
+                .finally(() => finish())
+          }
+      );
+      break;
+  }
+}
 </script>
 
 <template>
@@ -43,6 +81,9 @@ fetch().then().catch(e => messageError(e, message));
     </div>
     <div id="right-div">
       <span>{{ formatDate(new Date(square.creationTime * 1000)) }}</span>
+      <n-dropdown :options="dropdownOptions" @select="dropdownOnSelected">
+        <span style="margin-left: 4px" class="three-dots"></span>
+      </n-dropdown>
     </div>
   </div>
 </template>
@@ -67,5 +108,9 @@ fetch().then().catch(e => messageError(e, message));
 
 #content {
   word-wrap: break-word;
+}
+
+.three-dots:after {
+  content: '\2807';
 }
 </style>

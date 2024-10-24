@@ -10,7 +10,7 @@ import AdoptionRequest from "./AdoptionRequest.vue";
 import DateView from "./DateView.vue";
 import AdoptionStatus from "./AdoptionStatus.vue";
 import {confirmApiRequest, delay, formatDate, messageError} from "../main.ts";
-import {checkOwner} from "../jwt.ts";
+import {checkOwned} from "../jwt.ts";
 
 const message = useMessage();
 const dialog = useDialog();
@@ -101,7 +101,7 @@ function operationOnSelected(key: DropdownKey) {
             <UserBox :avatar-image="imageUrl(animalInfo.userAvatarImageId)"
                      :username="animalInfo.username"/>
             <div>
-              <n-dropdown v-if="checkOwner(animalInfo.postUid)" :options="operationOptions"
+              <n-dropdown v-if="checkOwned(animalInfo.postUid)" :options="operationOptions"
                           @select="operationOnSelected">
                 <n-button>操作</n-button>
               </n-dropdown>

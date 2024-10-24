@@ -1,8 +1,8 @@
-use crate::db::{PgCount, SquarePostRow};
+use crate::db::{PgCount, RowId, SquarePostRow};
 use crate::handlers::{handle_errors, PaginationQuery};
 use crate::jwt::validate_token;
 use crate::{api_ok, include_sql, ApiExtension, AuthHeader};
-use axum::extract::Query;
+use axum::extract::{Path, Query};
 use axum::response::IntoResponse;
 use axum::{debug_handler, Form};
 use serde::{Deserialize, Serialize};
@@ -56,6 +56,31 @@ pub async fn post_new(
             .bind(claims.uid)
             .bind(form.content)
             .bind(images)
+            .execute(&ext.db)
+            .await?;
+
+        return api_ok!(());
+    };
+    handle_errors!(r)
+}
+
+pub macro check_owned_or_admin($claims:expr, $post_id:expr, $db:expr) {{
+    crate::handlers::check_owned_or_admin!($claims, $post_id, $db, "check-square-post-owned")
+}}
+
+#[debug_handler]
+pub async fn delete(
+    ext: ApiExtension,
+    auth: AuthHeader,
+    path: Path<(RowId,)>,
+) -> impl IntoResponse {
+    let r: anyhow::Result<_> = try {
+        let claims = validate_token!(auth);
+        let post_id = path.0 .0;
+        check_owned_or_admin!(claims, post_id, &ext.db);
+
+        sqlx::query(include_sql!("delete-square-post"))
+            .bind(post_id)
             .execute(&ext.db)
             .await?;
 

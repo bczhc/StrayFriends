@@ -44,7 +44,7 @@ export function checkAdmin() {
  * Check the user logged in has uid `uid`.
  * @param uid
  */
-export function checkOwner(uid: number) {
+export function checkOwned(uid: number) {
     let claims = JWT_GET_CLAIMS();
     if (!claims) return false;
 
