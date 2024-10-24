@@ -152,6 +152,7 @@ pub struct AnimalInfoQueryRow {
     pub image_id_list: Vec<String>,
     pub creation_time: TimestampSec,
     pub adopted: bool,
+    pub post_uid: RowId,
 }
 
 #[derive(Serialize, Debug, FromRow)]

@@ -38,3 +38,14 @@ export function checkAdmin() {
     let admin = JWT_GET_CLAIMS()?.user.admin;
     return admin === undefined ? false : admin;
 }
+
+/**
+ * Check the user logged in has uid `uid`.
+ * @param uid
+ */
+export function checkOwner(uid: number) {
+    let claims = JWT_GET_CLAIMS();
+    if (!claims) return false;
+
+    return claims.user.id === uid;
+}

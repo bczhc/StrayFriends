@@ -132,6 +132,7 @@ export interface AnimalCardInfo {
     imageIdList: string[],
     postId: number,
     adopted: boolean,
+    postUid: number,
 }
 
 export interface AdoptionRequest {

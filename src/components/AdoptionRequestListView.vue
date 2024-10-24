@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {AnimalCardInfo, apiDelete, apiGet, apiPatch, imageUrl, User} from "../api.ts";
-import {messageError} from "../main.ts";
-import {DialogOptions, useDialog, useMessage} from 'naive-ui';
+import {confirmApiRequest, messageError} from "../main.ts";
+import {useDialog, useMessage} from 'naive-ui';
 import {ref, Ref} from "vue";
 import UserBox from "./UserBox.vue";
 import {useRouter} from "vue-router";
@@ -49,36 +49,22 @@ async function markAnimalAsAdopted() {
 }
 
 function deleteConfirm() {
-  let d: DialogOptions;
-  d = dialog.warning({
-    title: '删除',
-    content: '是否删除？',
-    positiveText: '是',
-    negativeText: '否',
-    onPositiveClick: () => {
-      d.loading = true;
-      return new Promise(resolve => {
+  confirmApiRequest(dialog, '删除', '是否删除',
+      finish => {
         deleteRequest().catch(e => messageError(e, message)).then(_r => {
           message.success('删除成功');
           emit('update');
-          d.loading = false;
-          resolve();
+          finish();
         });
       });
-    }
-  });
 }
 
 function approveConfirm() {
-  let d: DialogOptions;
-  d = dialog.warning({
-    title: '同意',
-    content: '是否标记为已领养？',
-    positiveText: '是',
-    negativeText: '否',
-    onPositiveClick: () => {
-      d.loading = true;
-      return new Promise(resolve => {
+  confirmApiRequest(
+      dialog,
+      '同意',
+      '是否标记为已领养？',
+      finish => {
         // approve and then delete the request
         const f = async () => {
           await markAnimalAsAdopted();
@@ -86,13 +72,11 @@ function approveConfirm() {
         };
         f().catch(e => messageError(e, message)).then(_r => {
           message.success('操作成功');
-          d.loading = false;
           emit('update');
-          resolve();
+          finish();
         })
-      });
-    }
-  });
+      }
+  )
 }
 
 function operationClick(key: Key) {

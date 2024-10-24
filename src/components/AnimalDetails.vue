@@ -10,6 +10,7 @@ import AdoptionRequest from "./AdoptionRequest.vue";
 import DateView from "./DateView.vue";
 import AdoptionStatus from "./AdoptionStatus.vue";
 import {formatDate, messageError} from "../main.ts";
+import {checkOwner} from "../jwt.ts";
 
 const message = useMessage();
 
@@ -24,6 +25,20 @@ apiGet(`/api/animal/${animalId}`).then(r => {
 }).catch(e => messageError(e, message));
 
 let showAdoptionModal = ref(false);
+
+type DropdownKey = 'delete';
+
+let operationOptions: { key: DropdownKey, label: string }[] = [
+  {key: 'delete', label: '删除'}
+];
+
+function operationOnSelected(key: DropdownKey) {
+  switch (key) {
+    case "delete":
+
+      break;
+  }
+}
 </script>
 
 <template>
@@ -59,6 +74,10 @@ let showAdoptionModal = ref(false);
             <UserBox :avatar-image="imageUrl(animalInfo.userAvatarImageId)"
                      :username="animalInfo.username"/>
             <div>
+              <n-dropdown v-if="checkOwner(animalInfo.postUid)" :options="operationOptions"
+                          @select="operationOnSelected">
+                <n-button>操作</n-button>
+              </n-dropdown>
               <n-button>爱心捐赠</n-button>
               <n-button @click="showAdoptionModal = true" :disabled="animalInfo.adopted">申请领养</n-button>
             </div>

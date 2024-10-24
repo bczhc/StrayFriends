@@ -1,8 +1,9 @@
 import {createApp} from "vue";
-import naive from 'naive-ui';
+import naive, {DialogOptions} from 'naive-ui';
 import {router} from "./routes.ts";
 import AppRoot from "./AppRoot.vue";
 import {MessageApiInjection} from "naive-ui/es/message/src/MessageProvider";
+import {DialogApiInjection} from "naive-ui/es/dialog/src/DialogProvider";
 
 createApp(AppRoot)
     .use(router)
@@ -38,4 +39,28 @@ export function paginationCount(total: number, pageSize: number) {
         return total / pageSize;
     }
     return Math.floor(total / pageSize) + 1;
+}
+
+export function confirmApiRequest(
+    dialog: DialogApiInjection,
+    title: string,
+    content: string,
+    callback: (finish: () => void) => void
+) {
+    let d: DialogOptions;
+    d = dialog.warning({
+        title,
+        content,
+        positiveText: '是',
+        negativeText: '否',
+        onPositiveClick: () => {
+            d.loading = true;
+            return new Promise(resolve => {
+                callback(() => {
+                    d.loading = false;
+                    resolve();
+                });
+            });
+        },
+    });
 }

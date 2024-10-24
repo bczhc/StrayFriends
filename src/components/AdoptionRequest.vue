@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref} from "vue";
-import {CHECK_DIGITS, messageError} from "../main.ts";
+import {CHECK_DIGITS, confirmApiRequest, messageError} from "../main.ts";
 import {useDialog, useMessage} from 'naive-ui';
 import {apiPost} from "../api.ts";
 
@@ -19,8 +19,6 @@ if (!props.postId) {
 const dialog = useDialog();
 const message = useMessage();
 
-let changeDialogLoading: (boolean) => void;
-
 async function submit() {
   return await apiPost('/api/adoption', {
     postId: props.postId,
@@ -30,30 +28,22 @@ async function submit() {
 }
 
 function submitClick() {
-  let d = dialog.warning({
-    title: '提交申请',
-    content: '确认提交吗？',
-    positiveText: '是',
-    negativeText: '否',
-    onPositiveClick: () => {
-      changeDialogLoading(true);
-      return new Promise(resolve => {
+  confirmApiRequest(
+      dialog,
+      '提交申请',
+      '确认提交吗？',
+      finish => {
         submit()
             .then(_r => {
               emit('success');
               message.success('已提交申请');
-              resolve();
             })
             .catch(e => messageError(e, message))
             .finally(() => {
-              changeDialogLoading(false);
+              finish();
             })
-      });
-    },
-  });
-  changeDialogLoading = (x: boolean) => {
-    d.loading = x;
-  };
+      }
+  )
 }
 </script>
 
