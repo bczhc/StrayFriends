@@ -40,6 +40,8 @@ let avatarImageId: Ref<string | null> = ref(null);
 
 let loaded = ref(false);
 
+let emit = defineEmits(['update']);
+
 apiGet('/api/me').then(r => {
   let data = r;
   console.log(data);
@@ -63,6 +65,7 @@ function updateInfoClick() {
     bio: bio.value,
   }).then(_r => {
     message.success('更新成功');
+    emit('update');
   }).catch(x => messageError(x, message)).finally(() => updating.value = false);
 }
 

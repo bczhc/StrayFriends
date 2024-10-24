@@ -2,7 +2,7 @@
 import {Component, h, Ref, ref} from "vue";
 import {NIcon, useMessage} from "naive-ui";
 import {LogOutOutline, PersonCircleOutline} from "@vicons/ionicons5";
-import {useRouter} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {checkAdmin, JWT_CLEAR, JWT_GET_CLAIMS} from "../jwt.ts";
 import UserInfo from "./UserInfo.vue";
 import {apiGet, imageUrl, User} from "../api.ts";
@@ -67,7 +67,9 @@ if (claims != null) {
         role="dialog"
         aria-modal="true"
     >
-      <UserInfo/>
+      <UserInfo
+          @update="showUserInfoModal = false; router.go()"
+      />
     </n-card>
   </n-modal>
 
