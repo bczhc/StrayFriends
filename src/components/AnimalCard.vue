@@ -2,6 +2,7 @@
 import {computed, ref} from "vue";
 import AdoptionRequest from "./AdoptionRequest.vue";
 import {useRouter} from "vue-router";
+import UserBox from "./UserBox.vue";
 
 let emit = defineEmits(['imageClick', 'adoptionClick', 'userProfileClick'])
 let router = useRouter();
@@ -46,7 +47,7 @@ let loading = computed(() => props.loading);
   <div id="parent">
     <div class="center-parent">
       <img :src="props.coverImage" alt="image" style="max-width: 100%"
-           @click="router.push('/animal/1'); emit('imageClick')"
+           @click="router.push(`/animal/${postId}`); emit('imageClick')"
            id="img"
            v-if="!loading"
       />
@@ -67,12 +68,11 @@ let loading = computed(() => props.loading);
       </n-text>
     </div>
     <div id="bottom-flex">
-      <div id="username-div" @click="emit('userProfileClick')">
-        <n-avatar :src="props.userAvatarImage" round v-if="!loading"/>
-        <n-avatar src="" round v-else/>
+      <UserBox :avatar-image="loading ? '' : props.userAvatarImage"
+               :username="props.username"
+               @click="emit('userProfileClick')"
+      />
 
-        <span id="username-text" v-if="!loading">{{ props.username }}</span>
-      </div>
       <n-button @click="adoptionClick" :disabled="loading">申请领养</n-button>
     </div>
   </div>
@@ -103,22 +103,6 @@ let loading = computed(() => props.loading);
   margin-top: -4px;
   transition: 0.2s ease-in-out;
   box-shadow: rgba(255, 255, 255, 0.1) 0 1px 1px 0 inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
-}
-
-#username-div {
-  padding-top: .5em;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-}
-
-#username-div:hover {
-  color: #36ad6a;
-  transition: color 0.2s ease-in-out;
-}
-
-#username-div > *:nth-child(2) {
-  margin-left: .5em;
 }
 
 #bottom-flex {

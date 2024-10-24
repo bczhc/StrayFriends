@@ -4,23 +4,13 @@ import Header from "./Header.vue";
 import AnimalCard from "./AnimalCard.vue";
 import {computed, ref} from "vue";
 import PostAnimal from "./PostAnimal.vue";
-import {apiGet, imageUrl} from "../api.ts";
+import {AnimalCardInfo, apiGet, imageUrl} from "../api.ts";
 import {useMessage} from 'naive-ui';
+import TextBanner from "./TextBanner.vue";
 
 const message = useMessage();
 
 let showPostAnimalModal = ref(false);
-
-interface AnimalCardInfo {
-  username: string,
-  userAvatarImageId: string,
-  name: string,
-  description: string,
-  content: string,
-  creationTime: number,
-  imageIdList: string[],
-  postId: number,
-}
 
 let animalsLoading = ref(true);
 
@@ -76,11 +66,7 @@ fetchAndUpdateAnimals();
   </n-modal>
 
   <Header/>
-  <div id="header">
-    <n-text class="display-large">
-      动物信息
-    </n-text>
-  </div>
+  <TextBanner height="300px" text="动物信息" font-size="5em"/>
   <div id="card-layout-wrapper">
     <div id="card-layout-wrapper-header">
       <div class="left-div">
@@ -130,20 +116,6 @@ fetchAndUpdateAnimals();
 #card-layout-wrapper {
   padding: 4em;
   background-color: lightgray;
-}
-
-#header {
-  height: 300px;
-  display: flex;
-  background-color: #c1633d;
-  justify-content: center;
-  align-items: center;
-}
-
-.display-large {
-  font-size: 5em;
-  font-weight: lighter;
-  color: white;
 }
 
 #card-layout-wrapper-header {

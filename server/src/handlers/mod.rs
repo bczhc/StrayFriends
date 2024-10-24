@@ -37,6 +37,7 @@ pub fn router() -> Router {
     add_route!(router, PUT "/me", account::update_info);
     add_route!(router, POST "/animal", animal::post_animal);
     add_route!(router, GET "/animals", animal::list);
+    add_route!(router, GET "/animal/:id", animal::query_animal_post);
     add_route!(router, POST "/adoption", adoption::file_adoption_request);
     router
 }

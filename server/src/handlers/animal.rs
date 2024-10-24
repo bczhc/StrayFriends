@@ -1,9 +1,9 @@
-use crate::db::{AnimalInfoQueryRow, AnimalPostForm};
+use crate::db::{AnimalInfoQueryRow, AnimalPostForm, RowId};
 use crate::handlers::{handle_errors, PaginationQuery};
 use crate::jwt::validate_token;
 use crate::{api_ok, include_sql, ApiExtension, AuthHeader};
 use anyhow::anyhow;
-use axum::extract::{Query, RawQuery};
+use axum::extract::{Path, Query, RawQuery};
 use axum::response::IntoResponse;
 use axum::{debug_handler, Form};
 use serde_with::serde_derive::{Deserialize, Serialize};
@@ -71,6 +71,23 @@ pub async fn list(ext: ApiExtension, query: RawQuery) -> impl IntoResponse {
             animals,
         };
         return api_ok!(response);
+    };
+    handle_errors!(r)
+}
+
+#[debug_handler]
+pub async fn query_animal_post(ext: ApiExtension, Path(path): Path<(RowId,)>) -> impl IntoResponse {
+    let r: anyhow::Result<_> = try {
+        let post_id = path.0;
+        let db = &ext.db;
+
+        let animal_info: AnimalInfoQueryRow = sqlx::query_as(include_sql!("query-animal-post"))
+            .bind(post_id)
+            .fetch_optional(db)
+            .await?
+            .ok_or_else(|| anyhow!("未找到记录"))?;
+
+        return api_ok!(animal_info);
     };
     handle_errors!(r)
 }

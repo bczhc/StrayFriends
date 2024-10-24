@@ -90,3 +90,14 @@ export function parseNUploadOnFinishEvent(event: Event) {
 export function imageUrl(digest: string) {
     return `/api/image/${digest}`;
 }
+
+export interface AnimalCardInfo {
+    username: string,
+    userAvatarImageId: string,
+    name: string,
+    description: string,
+    content: string,
+    creationTime: number,
+    imageIdList: string[],
+    postId: number,
+}
