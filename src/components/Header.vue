@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import {Component, h, ref} from "vue";
-import {NIcon} from "naive-ui";
+import {Component, h, Ref, ref} from "vue";
+import {NIcon, useMessage} from "naive-ui";
 import {LogOutOutline, PersonCircleOutline} from "@vicons/ionicons5";
 import {useRouter} from "vue-router";
-import {checkAdmin, JWT_CLEAR} from "../jwt.ts";
+import {checkAdmin, JWT_CLEAR, JWT_GET_CLAIMS} from "../jwt.ts";
 import UserInfo from "./UserInfo.vue";
+import {apiGet, imageUrl, User} from "../api.ts";
+import {messageError} from "../main.ts";
 
 let router = useRouter();
 let showUserInfoModal = ref(false);
+
+const message = useMessage();
 
 function renderIcon(icon: Component) {
   return () => {
@@ -43,6 +47,14 @@ function onDropdownSelected(key: DropdownKeys) {
       break;
   }
 }
+
+let userInfo: Ref<User | null> = ref(null);
+
+let claims = JWT_GET_CLAIMS();
+if (claims != null) {
+  apiGet(`/api/user/${claims.user.id}`).then(r => userInfo.value = r)
+      .catch(e => messageError(e, message));
+}
 </script>
 
 <template>
@@ -72,7 +84,7 @@ function onDropdownSelected(key: DropdownKeys) {
     </template>
     <template #extra>
       <n-dropdown :options="dropdownOptions" @select="onDropdownSelected">
-        <n-avatar round size="medium" src="/avatar-demo.jpg"></n-avatar>
+        <n-avatar round size="medium" :src="imageUrl(userInfo?.avatarImageId || '')"></n-avatar>
       </n-dropdown>
     </template>
     <template #subtitle>
