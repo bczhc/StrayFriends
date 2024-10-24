@@ -139,6 +139,21 @@ pub struct AnimalPostForm {
     pub mobile_number: String,
 }
 
+#[derive(Serialize, Debug, FromRow)]
+#[serde(rename_all = "camelCase")]
+pub struct AnimalInfoQueryRow {
+    pub username: String,
+    pub user_avatar_image_id: String,
+    pub name: String,
+    pub description: String,
+    pub content: String,
+    pub image_id_list: Vec<String>,
+    pub creation_time: TimestampSec,
+}
+
+type TimestampSec = UInt<u64>;
+
+/// Also integer types in pgsql are signed. This is a bridge type.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UInt<T>(T);
 
@@ -156,26 +171,32 @@ impl<T> Deref for UInt<T> {
     }
 }
 
-impl Decode<'_, Postgres> for UInt<u32> {
-    fn decode(value: <Postgres as Database>::ValueRef<'_>) -> Result<Self, BoxDynError> {
-        <i32 as Decode<'_, Postgres>>::decode(value).map(|x| Self(x as u32))
+/// Implement all the conversion traits.
+macro impl_uint($pg_ty:ty, $rs_ty:ty) {
+    impl Decode<'_, Postgres> for UInt<$rs_ty> {
+        fn decode(value: <Postgres as Database>::ValueRef<'_>) -> Result<Self, BoxDynError> {
+            <$pg_ty as Decode<'_, Postgres>>::decode(value).map(|x| Self(x as $rs_ty))
+        }
+    }
+    
+    impl Encode<'_, Postgres> for UInt<$rs_ty> {
+        fn encode_by_ref(
+            &self,
+            buf: &mut <Postgres as Database>::ArgumentBuffer<'_>,
+        ) -> Result<IsNull, BoxDynError> {
+            <$pg_ty as Encode<'_, Postgres>>::encode(self.0 as $pg_ty, buf)
+        }
+    }
+    
+    impl Type<Postgres> for UInt<$rs_ty> {
+        fn type_info() -> <Postgres as Database>::TypeInfo {
+            <$pg_ty as Type<Postgres>>::type_info()
+        }
     }
 }
 
-impl Encode<'_, Postgres> for UInt<u32> {
-    fn encode_by_ref(
-        &self,
-        buf: &mut <Postgres as Database>::ArgumentBuffer<'_>,
-    ) -> Result<IsNull, BoxDynError> {
-        <i32 as Encode<'_, Postgres>>::encode(self.0 as i32, buf)
-    }
-}
-
-impl Type<Postgres> for UInt<u32> {
-    fn type_info() -> <Postgres as Database>::TypeInfo {
-        <i32 as Type<Postgres>>::type_info()
-    }
-}
+impl_uint!(i32, u32);
+impl_uint!(i64, u64);
 
 pub type Uid = i64;
 

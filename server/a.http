@@ -12,3 +12,6 @@ Content-Type: application/octet-stream
 
 a
 ----------aaa
+###
+
+GET localhost:8081/animals?offset=1

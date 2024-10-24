@@ -1,6 +1,6 @@
 mod account;
-mod upload;
 mod animal;
+mod upload;
 
 use crate::mutex_lock;
 use axum::response::IntoResponse;
@@ -9,6 +9,9 @@ use log::info;
 use once_cell::sync::Lazy;
 use std::fmt;
 use std::sync::Mutex;
+
+use serde_with::{serde_as, DisplayFromStr};
+use serde_with::serde_derive::{Serialize, Deserialize};
 
 static COLLECTED_ROUTES: Lazy<Mutex<Vec<&'static str>>> =
     Lazy::new(|| Mutex::new(Default::default()));
@@ -32,6 +35,7 @@ pub fn router() -> Router {
     add_route!(router, GET "/image/:id", upload::image);
     add_route!(router, PUT "/me", account::update_info);
     add_route!(router, POST "/animal", animal::post_animal);
+    add_route!(router, GET "/animals", animal::list);
     router
 }
 
@@ -64,4 +68,38 @@ pub macro handle_errors($r:expr) {{
 #[debug_handler]
 pub async fn test_api() -> impl IntoResponse {
     "hello, world"
+}
+
+/// The common pagination query parameters
+/// 
+/// With `serde(flatten)`, query deserialization can't be handled well,
+/// I have to use this ugly workaround.
+/// 
+/// When using the workaround, note `Serialize` and `Deserialize` traits
+/// are from decent `serde_with::serde_derive::{Serialize, Deserialize}` instead,
+/// not from `serde`.
+/// 
+/// https://github.com/nox/serde_urlencoded/issues/33#issuecomment-629803582
+#[serde_as]
+#[derive(Deserialize, Debug, Eq, PartialEq)]
+pub struct PaginationQuery {
+    #[serde_as(as = "DisplayFromStr")]
+    offset: i32,
+    #[serde_as(as = "DisplayFromStr")]
+    limit: i32,
+}
+
+#[cfg(test)]
+mod test {
+    use crate::handlers::animal::ListQuery;
+    use crate::handlers::PaginationQuery;
+
+    #[test]
+    fn test() {
+        let a: Result<ListQuery, _> = serde_qs::from_str("offset=0&limit=20");
+        let query = ListQuery {
+            pagination: PaginationQuery { offset: 0, limit: 20 }
+        };
+        assert_eq!(a.ok(), Some(query));
+    }
 }

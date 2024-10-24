@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import AdoptionRequest from "./AdoptionRequest.vue";
 import {useRouter} from "vue-router";
-
-let username = ref('用户名');
 
 let emit = defineEmits(['imageClick', 'adoptionClick', 'userProfileClick'])
 let router = useRouter();
@@ -14,6 +12,17 @@ function adoptionClick() {
   emit('adoptionClick');
   showAdoptionModal.value = true;
 }
+
+const props = defineProps<{
+  coverImage?: string,
+  name?: string,
+  description?: string,
+  userAvatarImage?: string,
+  username?: string,
+  loading?: boolean,
+}>();
+
+let loading = computed(() => props.loading);
 </script>
 
 <template>
@@ -32,23 +41,35 @@ function adoptionClick() {
 
   <div id="parent">
     <div class="center-parent">
-      <img src="/2.jpg" alt="image" style="max-width: 100%"
+      <img :src="props.coverImage" alt="image" style="max-width: 100%"
            @click="router.push('/animal/1'); emit('imageClick')"
            id="img"
+           v-if="!loading"
       />
-      <n-h2 class="label">流浪狗</n-h2>
+      <n-skeleton
+          v-else
+          height="150px"
+      />
+      <n-h2 class="label">
+        <span v-if="!loading">{{ props.name }}</span>
+        <n-skeleton width="50%" style="margin-top: .1em" v-else/>
+      </n-h2>
+
     </div>
     <div style="padding: 5px">
       <n-text style="word-wrap: break-word">
-        路边发现的流浪狗，，，，，，，，，，，，，，，，，，，，
+        <span v-if="!loading">{{ props.description }}</span>
+        <n-skeleton v-else/>
       </n-text>
     </div>
     <div id="bottom-flex">
       <div id="username-div" @click="emit('userProfileClick')">
-        <n-avatar src="/avatar-demo.jpg" round/>
-        <span id="username-text">{{ username }}</span>
+        <n-avatar :src="props.userAvatarImage" round v-if="!loading"/>
+        <n-avatar src="" round v-else/>
+
+        <span id="username-text" v-if="!loading">{{ props.username }}</span>
       </div>
-      <n-button @click="adoptionClick">申请领养</n-button>
+      <n-button @click="adoptionClick" :disabled="loading">申请领养</n-button>
     </div>
   </div>
 </template>
@@ -57,6 +78,8 @@ function adoptionClick() {
 .label {
   margin: 0;
   padding: 0;
+  display: flex;
+  justify-content: center;
 }
 
 .center-parent {
@@ -69,6 +92,7 @@ function adoptionClick() {
   width: 20em;
   background-color: white;
   transition: margin-top 0.2s ease-in-out;
+  border-radius: 5px;
 }
 
 #parent:hover {

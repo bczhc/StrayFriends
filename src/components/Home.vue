@@ -4,8 +4,46 @@ import Header from "./Header.vue";
 import AnimalCard from "./AnimalCard.vue";
 import {ref} from "vue";
 import PostAnimal from "./PostAnimal.vue";
+import {apiGet, imageUrl} from "../api.ts";
+import {useMessage} from 'naive-ui';
+
+const message = useMessage();
 
 let showPostAnimalModal = ref(false);
+
+interface AnimalCardInfo {
+  username: string,
+  userAvatarImageId: string,
+  name: string,
+  description: string,
+  content: string,
+  creationTime: number,
+  imageIdList: string[],
+}
+
+let animalsLoading = ref(true);
+
+let animalCardInfoList = ref<AnimalCardInfo[]>([])
+
+// let queryOffset = ref(0);
+// let queryLimit = ref(0);
+
+let queryOffset = 0;
+let queryLimit = 10;
+
+apiGet(`/api/animals?offset=${queryOffset}&limit=${queryLimit}`)
+    .then(r => {
+      if (r.success()) {
+        let list = r.data as AnimalCardInfo[];
+        console.log(list);
+        animalCardInfoList.value = list;
+        animalsLoading.value = false;
+      } else {
+        message.error(r.messageOrEmpty())
+      }
+    }).catch(e => {
+  message.error(e.toString())
+})
 </script>
 
 <template>
@@ -41,13 +79,21 @@ let showPostAnimalModal = ref(false);
       </div>
     </div>
     <div id="card-layout">
-      <AnimalCard/>
-      <AnimalCard/>
-      <AnimalCard/>
-      <AnimalCard/>
-      <AnimalCard/>
-      <AnimalCard/>
-      <AnimalCard/>
+      <!-- show skeletons -->
+      <AnimalCard v-if="animalsLoading"
+                  v-for="() in Array(queryLimit)"
+                  loading
+      />
+      <AnimalCard
+          v-else
+          v-for="x in animalCardInfoList"
+          :cover-image="imageUrl(x.imageIdList[0])"
+          :description="x.description"
+          :name="x.name"
+          :user-avatar-image="imageUrl(x.userAvatarImageId)"
+          :username="x.username"
+          :loading="false"
+      />
     </div>
   </div>
 </template>

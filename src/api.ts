@@ -2,7 +2,7 @@ import axios, {AxiosResponse} from "axios";
 import {JWT_GET} from "./jwt.ts";
 import {delay} from "./main.ts";
 
-const SIMULATE_API_DELAY = 1000 /* 1s */;
+const SIMULATE_API_DELAY = 500 /* 500ms */;
 
 export class ApiResponse {
     code: number;
