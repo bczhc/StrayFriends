@@ -9,7 +9,7 @@ use strum::AsRefStr;
 
 const PASSWORD_SALT_LENGTH: usize = 16;
 
-#[derive(FromRow, Debug, Type, Serialize, Deserialize)]
+#[derive(FromRow, Debug, Type, Serialize, Deserialize, Default)]
 pub struct Password {
     pub blake3: String,
     pub salt: String,
@@ -48,15 +48,16 @@ pub type ImageId = String;
 #[derive(FromRow, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct User {
-    id: Uid,
-    name: String,
-    email: String,
-    avatar_image_id: Option<ImageId>,
-    bio: Option<String>,
-    #[serde(skip_serializing)]
+    pub id: Uid,
+    pub name: String,
+    pub email: String,
+    pub avatar_image_id: Option<ImageId>,
+    pub bio: Option<String>,
+    #[serde(skip_serializing, skip_deserializing)]
     password: Password,
-    gender_type: GenderTypePg,
-    gender_other: String,
+    pub gender_type: GenderTypePg,
+    pub gender_other: String,
+    pub admin: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, AsRefStr)]
@@ -153,6 +154,16 @@ pub struct AnimalInfoQueryRow {
     pub adopted: bool,
 }
 
+#[derive(Serialize, Debug, FromRow)]
+#[serde(rename_all = "camelCase")]
+pub struct AdoptionRequestQueryRow {
+    pub request_id: RowId,
+    pub post_uid: RowId,
+    pub animal_post_id: RowId,
+    pub request_details: String,
+    pub mobile_number: String,
+}
+
 type TimestampSec = UInt<u64>;
 
 /// Also integer types in pgsql are signed. This is a bridge type.
@@ -203,6 +214,7 @@ impl_uint!(i64, u64);
 /// Type `SERIAL` in PgSQL.
 pub type RowId = i64;
 pub type Uid = RowId;
+pub type PgCount = i64;
 
 #[cfg(test)]
 mod test {

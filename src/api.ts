@@ -102,3 +102,11 @@ export interface AnimalCardInfo {
     postId: number,
     adopted: boolean,
 }
+
+export interface AdoptionRequest {
+    requestId: number,
+    postUid: number,
+    animalPostId: number,
+    requestDetails: string,
+    mobileNumber: string,
+}

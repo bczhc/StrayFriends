@@ -3,7 +3,7 @@ import {Component, h, ref} from "vue";
 import {NIcon} from "naive-ui";
 import {LogOutOutline, PersonCircleOutline} from "@vicons/ionicons5";
 import {useRouter} from "vue-router";
-import {JWT_CLEAR} from "../jwt.ts";
+import {checkAdmin, JWT_CLEAR} from "../jwt.ts";
 import UserInfo from "./UserInfo.vue";
 
 let router = useRouter();
@@ -82,6 +82,11 @@ function onDropdownSelected(key: DropdownKeys) {
           <div id="navigations">
             <n-button text tag="a" class="nav-button" @click="router.push('/home')"><span>发布</span></n-button>
             <n-button text tag="a" class="nav-button" @click="router.push('/square')"><span>广场</span></n-button>
+            <n-button text tag="a" class="nav-button" @click="router.push('/adoptions')"
+                      v-if="checkAdmin()"
+            >
+              <span>申请管理</span>
+            </n-button>
           </div>
         </div>
       </div>

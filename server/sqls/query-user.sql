@@ -5,6 +5,7 @@ SELECT id,
        bio,
        password,
        (gender).type  as gender_type,
-       (gender).other as gender_other
+       (gender).other as gender_other,
+       admin
 FROM "user"
 WHERE id = $1

@@ -1,4 +1,4 @@
-use crate::db::{change_password, Gender, GenderPg, Password, Uid, User};
+use crate::db::{change_password, Gender, GenderPg, Password, RowId, Uid, User};
 use crate::handlers::{api_error, handle_errors};
 use crate::jwt::{validate_token, Claims};
 use crate::{api_ok, db, include_sql, ApiContext, ApiExtension, AuthHeader, DbPool};
@@ -11,7 +11,7 @@ use axum_extra::extract::CookieJar;
 use axum_extra::headers::authorization::Bearer;
 use axum_extra::{headers, TypedHeader};
 use serde::Deserialize;
-use sqlx::{query, Executor};
+use sqlx::{query, Executor, PgPool};
 use std::sync::Arc;
 use log::debug;
 
@@ -57,8 +57,9 @@ pub async fn login(ext: ApiExtension, form: axum::Form<LoginForm>) -> impl IntoR
         if !Password::new(query.1, query.2).validate(&form.password) {
             return api_error!("用户名或密码错误");
         }
-
-        let jwt = Claims::new(email, query.0).encode()?;
+        
+        let user = query_user(db, query.0).await?;
+        let jwt = Claims::new(user, query.0).encode()?;
         return api_ok!(jwt);
     };
     handle_errors!(result)
@@ -98,7 +99,15 @@ async fn query_id_from_email(db: &DbPool, email: &str) -> anyhow::Result<Option<
 #[debug_handler]
 pub async fn my_email(auth: AuthHeader) -> impl IntoResponse {
     let claims = validate_token!(auth);
-    api_ok!(claims.email)
+    api_ok!(claims.user.email)
+}
+
+async fn query_user(db: &PgPool, uid: RowId) -> anyhow::Result<User> {
+    let user: User = sqlx::query_as(include_sql!("query-user"))
+        .bind(uid)
+        .fetch_one(db)
+        .await?;
+    Ok(user)
 }
 
 #[debug_handler]
@@ -107,10 +116,7 @@ pub async fn my_info(ext: ApiExtension, auth: AuthHeader) -> impl IntoResponse {
     let r: anyhow::Result<()> = try {
         let db = &ext.db;
         let uid = claims.uid;
-        let user: User = sqlx::query_as(include_sql!("query-user"))
-            .bind(uid)
-            .fetch_one(db)
-            .await?;
+        let user = query_user(db, uid).await?;
         return api_ok!(user);
     };
     handle_errors!(r)
