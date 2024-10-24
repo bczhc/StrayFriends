@@ -65,7 +65,9 @@ function onDropdownSelected(key: DropdownKeys) {
     <template #title>
       <div style="position: absolute">
         <span class="ver-center" id="header-title">主页</span>
-        <img src="/icon.png" alt="" class="icon-img ver-center">
+        <img src="/icon.png" alt="" class="icon-img ver-center"
+             id="app-icon"
+             @click="router.push('/home')">
       </div>
     </template>
     <template #extra>
@@ -74,7 +76,15 @@ function onDropdownSelected(key: DropdownKeys) {
       </n-dropdown>
     </template>
     <template #subtitle>
-      <span id="subtitle">流浪动物救助站</span>
+      <div id="subtitle">
+        <div>
+          <span>流浪动物救助站</span>
+          <div id="navigations">
+            <n-button text tag="a" class="nav-button" @click="router.push('/home')"><span>发布</span></n-button>
+            <n-button text tag="a" class="nav-button" @click="router.push('/square')"><span>广场</span></n-button>
+          </div>
+        </div>
+      </div>
     </template>
   </n-page-header>
   <n-divider style="margin: 0"/>
@@ -106,5 +116,20 @@ function onDropdownSelected(key: DropdownKeys) {
   position: relative;
   left: 8em;
   color: #616161;
+}
+
+#subtitle > div {
+  display: inline-flex;
+  align-items: center;
+}
+
+#navigations {
+  margin-left: 3em;
+  display: inline-flex;
+  gap: 3em;
+}
+
+#app-icon {
+  cursor: pointer;
 }
 </style>
