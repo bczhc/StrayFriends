@@ -43,12 +43,13 @@ pub fn router() -> Router {
     add_route!(router, GET "/animal/:id", animal::query_animal_post);
     add_route!(router, POST "/adoption", adoption::file_adoption_request);
     add_route!(router, GET "/user/:id", account::query_user_api);
+    /* ====================== OWNER OR ADMIN ====================== */
+    add_route!(router, PATCH "/animal/:id/adopt", animal::set_adopted);
+    add_route!(router, DELETE "/animal/:id", animal::delete);
     /* ====================== ADMIN ====================== */
     add_route!(router, GET "/adoptions/count", adoption::count);
     add_route!(router, GET "/adoptions/list", adoption::list_requests);
     add_route!(router, DELETE "/adoption/:id", adoption::delete);
-    add_route!(router, PATCH "/animal/:id/adopt", animal::set_adopted);
-    add_route!(router, DELETE "/animal/:id", animal::delete);
     /* =================================================== */
     router
 }

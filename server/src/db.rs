@@ -56,7 +56,7 @@ pub struct User {
     #[serde(skip_serializing, skip_deserializing)]
     password: Password,
     pub gender_type: GenderTypePg,
-    pub gender_other: String,
+    pub gender_other: Option<String>,
     pub admin: bool,
 }
 

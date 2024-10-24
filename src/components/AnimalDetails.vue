@@ -1,41 +1,68 @@
 <script setup lang="ts">
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import Header from "./Header.vue";
 import TextBanner from "./TextBanner.vue";
-import {AnimalCardInfo, apiGet, imageUrl} from "../api.ts";
+import {AnimalCardInfo, apiDelete, apiGet, apiPatch, imageUrl} from "../api.ts";
 import {Ref, ref} from "vue";
-import {useMessage} from 'naive-ui';
+import {useDialog, useMessage} from 'naive-ui';
 import UserBox from "./UserBox.vue";
 import AdoptionRequest from "./AdoptionRequest.vue";
 import DateView from "./DateView.vue";
 import AdoptionStatus from "./AdoptionStatus.vue";
-import {formatDate, messageError} from "../main.ts";
+import {confirmApiRequest, delay, formatDate, messageError} from "../main.ts";
 import {checkOwner} from "../jwt.ts";
 
 const message = useMessage();
+const dialog = useDialog();
 
+let router = useRouter();
 let route = useRoute();
 let animalId = route.params['id'];
 
 let animalInfo: Ref<AnimalCardInfo | null> = ref(null);
 
-apiGet(`/api/animal/${animalId}`).then(r => {
-  console.log(r);
-  animalInfo.value = r as AnimalCardInfo;
-}).catch(e => messageError(e, message));
+function fetch() {
+  apiGet(`/api/animal/${animalId}`).then(r => {
+    console.log(r);
+    animalInfo.value = r as AnimalCardInfo;
+  }).catch(e => messageError(e, message));
+}
+
+fetch();
 
 let showAdoptionModal = ref(false);
 
-type DropdownKey = 'delete';
+type DropdownKey = 'delete' | 'mark as adopted';
 
 let operationOptions: { key: DropdownKey, label: string }[] = [
-  {key: 'delete', label: '删除'}
+  {key: 'delete', label: '删除'},
+  {key: 'mark as adopted', label: '标记为已被领养'},
 ];
 
 function operationOnSelected(key: DropdownKey) {
   switch (key) {
     case "delete":
-
+      confirmApiRequest(
+          dialog,
+          '删除',
+          '是否删除',
+          finish => {
+            apiDelete(`/api/animal/${animalId}`).then(_r => {
+              message.success('操作成功，正在返回主页');
+              delay(1000).then(() => {
+                router.push('/home');
+              })
+            }).catch(e => messageError(e, message)).finally(() => {
+              finish();
+            })
+          }
+      );
+      break;
+    case "mark as adopted":
+      apiPatch(`/api/animal/${animalId}/adopt`).then(_r => {
+        message.success('操作成功');
+        fetch();
+      })
       break;
   }
 }

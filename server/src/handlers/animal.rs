@@ -1,7 +1,7 @@
 use crate::db::{AnimalInfoQueryRow, AnimalPostForm, RowId};
 use crate::handlers::{handle_errors, PaginationQuery};
 use crate::jwt::{validate_token, validate_token_admin};
-use crate::{api_ok, include_sql, ApiExtension, AuthHeader};
+use crate::{api_ok, include_sql, jwt, ApiExtension, AuthHeader};
 use anyhow::anyhow;
 use axum::extract::{Path, Query, RawQuery};
 use axum::response::IntoResponse;
@@ -92,6 +92,18 @@ pub async fn query_animal_post(ext: ApiExtension, Path(path): Path<(RowId,)>) ->
     handle_errors!(r)
 }
 
+macro check_owned($claims:expr, $post_id:expr, $db:expr) {
+    let (owned,): (bool,) = sqlx::query_as(include_sql!("check-animal-post-owner"))
+        .bind($post_id)
+        .bind($claims.uid)
+        .fetch_optional($db)
+        .await?
+        .unwrap_or((false,));
+    if !owned {
+        jwt::axum_return_unauthorized!();
+    }
+}
+
 #[debug_handler]
 pub async fn set_adopted(
     ext: ApiExtension,
@@ -100,6 +112,7 @@ pub async fn set_adopted(
 ) -> impl IntoResponse {
     let r: anyhow::Result<_> = try {
         let claims = validate_token_admin!(auth);
+        check_owned!(claims, path.0 .0, &ext.db);
         sqlx::query(include_sql!("animal-set-adopted"))
             .bind(path.0 .0)
             .execute(&ext.db)
@@ -117,6 +130,7 @@ pub async fn delete(
 ) -> impl IntoResponse {
     let r: anyhow::Result<_> = try {
         let claims = validate_token_admin!(auth);
+        check_owned!(claims, path.0 .0, &ext.db);
         sqlx::query(include_sql!("animal-delete"))
             .bind(path.0 .0)
             .execute(&ext.db)
